@@ -1,0 +1,8 @@
+# .gitignore file for openlilylib/gruppen.git
+
+# Python files
+*.pyc
+
+# Backup files
+*.*~
+*.bak
