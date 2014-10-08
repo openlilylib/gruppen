@@ -28,6 +28,7 @@ Project properties
 import os
 import json
 import codecs
+import vcs
 
 # Project object
 class Project(object):
@@ -46,9 +47,8 @@ class Project(object):
             directory = os.path.join(os.getcwd(), directory)
         self.properties['paths']['root'] = os.path.normpath(directory)
 
-        # check if we're in a Git directory
-        if not os.path.isdir(os.path.join(self.properties['paths']['root'], '.git')):
-            raise AssertionError("Directory {} does not exist or is no Git directory".format(self.root))
+        # check if we're in a VCS repository and create VCS object
+        self.vcs = vcs.open(self.properties['paths']['root'])
         
         # set/determine information on the project directory structure.
         # If the file project/properties.json is present it is parsed,
