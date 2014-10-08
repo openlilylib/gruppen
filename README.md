@@ -44,3 +44,7 @@ include:
     - Sort/group/analyze them
     - Edit them in a convenient interface
     - Exporting reports
+- **Versioning workflows (?)**
+    - Encapsulating general steps (common branch handling)
+    - Editing commits (for example in order to ensure consistency in messages)
+    - visualizing repository state
