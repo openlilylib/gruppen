@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-4.6.dtd">
 <!-- eric4 project file for project Gruppen -->
-<!-- Saved: 2014-10-08, 11:10:47 -->
+<!-- Saved: 2014-10-08, 18:39:30 -->
 <!-- Copyright (C) 2014 Urs Liska, ul@openlilylib.org -->
 <Project version="4.6">
   <Language>en</Language>
@@ -18,6 +18,10 @@
     <Source>gruppen_app/info.py</Source>
     <Source>python/init.py</Source>
     <Source>gruppen_app/project/__init__.py</Source>
+    <Source>gruppen_app/commandline.py</Source>
+    <Source>gruppen_app/vcs/git.py</Source>
+    <Source>gruppen_app/vcs/__init__.py</Source>
+    <Source>python/test-git-commands.py</Source>
   </Sources>
   <Forms>
   </Forms>
