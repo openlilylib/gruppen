@@ -75,4 +75,17 @@ class Segment(object):
         except:
             raise
         
+    def status(self):
+        """Return the status property of the segment."""
+        if self.deleted:
+            return "deleted"
+        if self.meta_fields['entered-by'][0]:
+            if self.meta_fields['proofread-by'][0]:
+                return "reviewed"
+            else:
+                return "entered"
+        else:
+            return "not-done"
+    
+
 
