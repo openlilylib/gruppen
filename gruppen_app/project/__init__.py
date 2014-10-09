@@ -73,6 +73,20 @@ class Project(object):
         """Return project property - as if Project were a dict object"""
         return self.properties[property]
         
+    def init_voice_names(self, voices):
+        """Populate the list of voice names.
+        'voices' can be a callable that returns a list
+        with voice names. Some possible functions are defined
+        in the class."""
+        self.properties['voice_names'] =  [v for v in voices()] if callable(voices) else voices
+    
+    def _voice_names_by_dirlist(self):
+        """Return a list of directories under ['music'] path."""
+        base = self['paths']['music']
+        dir = os.listdir(base)
+        dir.sort()
+        return [entry for entry in dir if os.path.isdir(os.path.join(base, entry))]
+        
     def read_properties_from_json(self):
         """Read a JSON file containing project properties."""
         try:
