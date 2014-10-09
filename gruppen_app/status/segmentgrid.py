@@ -38,4 +38,9 @@ class SegmentGrid(object):
         self._completion = None
         
 
+    def __iter__(self):
+        """Iterate over voices in the order given by self._voice_list."""
+        for v in self._voice_list:
+            yield self.voices[v]
+    
         
