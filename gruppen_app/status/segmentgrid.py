@@ -46,6 +46,12 @@ class SegmentGrid(object):
         for v in self._voice_list:
             yield self.voices[v]
     
+    def add_voice(self, voice_name):
+        """Add a VoiceRow object and let it parse the directory"""
+        if not voice_name in self.voice_names():
+            self.project['voice_names'].append(voice_name)
+        self._voices[voice_name] = voicerow.VoiceRow(self, voice_name)
+        
     def segment_names(self):
         return self.project['segment_names']
 
