@@ -27,6 +27,7 @@ Segment properties
 """
 
 import os
+import codecs
 
 class Segment(object):
     
@@ -46,5 +47,15 @@ class Segment(object):
         else:
             self.deleted = False        
             self.meta_fields = {}
-#            self.read_file(filename)
+            self.read_file()
 #            self.parse_file()
+
+    def read_file(self):
+        """Load the segment from file"""
+        try:
+            f = f = codecs.open(self.filename, 'r', 'utf-8')
+            self.file_content = f.readlines()
+        except:
+            raise
+        
+
