@@ -27,6 +27,7 @@ Segment properties
 """
 
 import os
+import re
 import codecs
 
 class Segment(object):
@@ -48,8 +49,24 @@ class Segment(object):
             self.deleted = False        
             self.meta_fields = {}
             self.read_file()
-#            self.parse_file()
+            self.parse_file()
 
+    def comma_list(self, input):
+        """return a cleaned list of comma-separated entries"""
+        return [entry.strip() for entry in input.split(',')]
+        
+    def parse_file(self):
+        """Analyse the file"""
+        self.parse_meta_fields()
+        
+    def parse_meta_fields(self):
+        """Read the metadata fields from the
+        header comment section."""
+        for line in self.file_content:
+            m = re.search('(@entered-by|@entry-date|@proofread-by|@proof-date).*:', line)
+            if m:
+                self.meta_fields[m.group(1)[1:]] = self.comma_list(line[m.end()+1:])
+        
     def read_file(self):
         """Load the segment from file"""
         try:
