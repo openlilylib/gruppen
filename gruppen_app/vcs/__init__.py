@@ -58,6 +58,23 @@ class VCSRepo(object):
         pass
 
     @abstractmethod
+    def branches(self, local=True):
+        """
+        Returns a string list of branch names.
+        The currently checked out branch will have a
+        leading '* '.
+        If local == False also return 'remote' branches.
+        """
+        pass
+
+    @abstractmethod
+    def checkout(self, branch):
+        """
+        Try to checkout a branch.
+        """
+        pass
+        
+    @abstractmethod
     def current_branch(self):
         """Return the name of the currently checked-out branch."""
         pass
@@ -82,7 +99,7 @@ class VCSRepo(object):
         
         # definition in subclasses!
         import __main__
-        start_dir = __main__.project['paths']['music']
+        start_dir = __main__.project.rel_path('music') + '/'
         lines = self.deleted_files_with_deleters(start_dir)
         
         # preset name of commit author
@@ -90,15 +107,15 @@ class VCSRepo(object):
         for line in lines:
             if line.startswith('parts/'):
                 basepath, sink = os.path.splitext(line)
-                part, segment = os.path.split(basepath)
-                part = part[6:]
+                voice, segment = os.path.split(basepath)
+                voice = voice[len(start_dir):]
                 
                 # if part is met for the first time:
-                if not part in self._deletions:
-                    self._deletions[part] = {}
+                if not voice in self._deletions:
+                    self._deletions[voice] = {}
                 
                 # assing the author to the deleted segment
-                self._deletions[part][segment] = deletor
+                self._deletions[voice][segment] = deletor
             elif not line:
                 # Empty lines don't count
                 continue

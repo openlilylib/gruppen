@@ -43,7 +43,7 @@ class GitRepo(vcs.VCSRepo):
         try:
             self.version = ''.join(self._run_command('--version'))
         except:
-            raise VCSError("Git is not installed")
+            raise vcs.VCSError("Git is not installed")
         
         super(GitRepo, self).__init__()
     
@@ -67,12 +67,30 @@ class GitRepo(vcs.VCSRepo):
         (out, error) = pr.communicate()
         if error:
             raise GitError(str(error))
-        result = str(out).split('\n')
+        result = out.decode('utf8').split('\n')
         if result[-1] == '':
             result.pop()
         return result
         
+    def branches(self, local=True):
+        """
+        Returns a string list of branch names.
+        The currently checked out branch will have a
+        leading '* '.
+        If local == False also return 'remote' branches.
+        """
+        args = [] if local else ['-a']
+        args.append('--color=never')
+        return [line.strip() for line in self._run_command('branch', args)]
 
+    def checkout(self, branch):
+        """
+        Tries to checkout a branch.
+        Add '-q' option because git checkout will
+        return its confirmation message on stderr.
+        May raise a GitError exception"""
+        self._run_command('checkout', ['-q', branch])
+        
     def current_branch(self):
         """Return the name of the currently checked-out branch."""
         branch_ref = ''.join(self._run_command('symbolic-ref -q HEAD'))
@@ -85,7 +103,7 @@ class GitRepo(vcs.VCSRepo):
         result = {}
         for i in range(len(names)):
             try:
-                name = names[i].decode()
+                name = names[i].decode('utf8')
             except:
                 name = 'EncodingError'
             result[name] = str(
@@ -100,7 +118,7 @@ class GitRepo(vcs.VCSRepo):
         - files deleted by the commit
         - trailing empty line
         per commit."""
-        if not os.path.isdir(start_dir):
+        if not os.path.isdir(os.path.join(__main__.project['paths']['root'], start_dir)):
             raise vcs.VCSError("Starting directory for determining deleted files\n" +
                            "doesn't exist: {}".format(start_dir))
         return self._run_command('log  --diff-filter=DR --pretty=format:\'%an\' --name-only {start}'.format(start = start_dir))

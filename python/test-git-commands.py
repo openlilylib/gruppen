@@ -51,7 +51,18 @@ def main():
     print
     print git.version
     print
-    print "Current branch:", git.current_branch()
+    print "Branches:"
+    print git.branches(False)
+    print
+    current_branch = git.current_branch()
+    print "Current branch:", current_branch
+    print
+    print "Checkout current_branch (again):"
+    import vcs
+    try:
+        git.checkout(current_branch)
+    except vcs.VCSError as e:
+        print e
     print
     print "Last commit:"
     print git.last_commit()
@@ -64,7 +75,6 @@ def main():
     print
     print
     print "Deleted files:"
-    import vcs
     try:
         print '\n'.join(git.deleted_files_with_deleters(project['paths']['music']))
     except vcs.VCSError as e:

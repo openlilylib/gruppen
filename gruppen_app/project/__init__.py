@@ -78,6 +78,12 @@ class Project(object):
         except Exception as e:
             raise Exception("Error reading properties file: {}".format(e))
 
+    def rel_path(self, path_property):
+        """Return the path of a property relative to root."""
+        if not path_property in self['paths']:
+            raise KeyError('Unknown path property {}'.format(path_property))
+        return self['paths'][path_property][len(self['paths']['root'])+1:]
+        
     def set_defaults(self):
         """Set default values to project configuration variables
         if they can't be read from project/structure.json"""
