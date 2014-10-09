@@ -43,7 +43,7 @@ class GitRepo(vcs.VCSRepo):
         try:
             self.version = ''.join(self._run_command('--version'))
         except:
-            raise VCSError("Git is not installed")
+            raise vcs.VCSError("Git is not installed")
         
         super(GitRepo, self).__init__()
     
