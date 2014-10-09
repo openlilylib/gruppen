@@ -73,6 +73,24 @@ class Project(object):
         """Return project property - as if Project were a dict object"""
         return self.properties[property]
         
+    def init_segment_names(self, segs):
+        """Populate the list of segment names.
+        'segs' can be a callable that returns a list
+        with segment names. Some possible functions are defined
+        in the class."""
+        self.properties['segment_names'] =  [s for s in segs()] if callable(segs) else segs
+
+    def _segment_names_as_int_range(self, upper, digits= 0 , zero_based = True):
+        """Return a list of normalized integer segment names.
+        'upper' is treated in the pythonic way (up to but not including).
+        names are padded with zeroes either to the length of the highest value
+        or using the digits argument (if that's present and high enough)."""
+        lower = 0 if zero_based else 1
+        max_digits = max(digits, len(str(upper-1)))
+        pad = '0' + str(max_digits)
+        return [format(i, pad) for i in range(lower, upper)]
+        
+        
     def init_voice_names(self, voices):
         """Populate the list of voice names.
         'voices' can be a callable that returns a list
