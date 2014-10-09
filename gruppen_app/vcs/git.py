@@ -67,7 +67,7 @@ class GitRepo(vcs.VCSRepo):
         (out, error) = pr.communicate()
         if error:
             raise GitError(str(error))
-        result = str(out).split('\n')
+        result = out.decode('utf8').split('\n')
         if result[-1] == '':
             result.pop()
         return result
@@ -103,7 +103,7 @@ class GitRepo(vcs.VCSRepo):
         result = {}
         for i in range(len(names)):
             try:
-                name = names[i].decode()
+                name = names[i].decode('utf8')
             except:
                 name = 'EncodingError'
             result[name] = str(
