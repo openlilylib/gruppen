@@ -72,6 +72,16 @@ class GitRepo(vcs.VCSRepo):
             result.pop()
         return result
         
+    def branches(self, local=True):
+        """
+        Returns a string list of branch names.
+        The currently checked out branch will have a
+        leading '* '.
+        If local == False also return 'remote' branches.
+        """
+        args = [] if local else ['-a']
+        args.append('--color=never')
+        return [line.strip() for line in self._run_command('branch', args)]
 
     def current_branch(self):
         """Return the name of the currently checked-out branch."""

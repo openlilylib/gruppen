@@ -51,6 +51,9 @@ def main():
     print
     print git.version
     print
+    print "Branches:"
+    print git.branches(False)
+    print
     print "Current branch:", git.current_branch()
     print
     print "Last commit:"
