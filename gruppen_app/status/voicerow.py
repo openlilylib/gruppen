@@ -28,15 +28,30 @@ Row representing all segments in a voice
 
 import os
 
+import segment
+
 class VoiceRow(object):
     def __init__(self, segment_grid, voice_name):
         self.owner = segment_grid
+        self.voice_name = voice_name
         self.project = self.owner.project
         self.vcs = self.project.vcs
         self._segments = {}
         self._dir = os.path.join(self.project['paths']['music'], voice_name)
+        
+        for seg in self.segment_names():
+            self._segments[seg] = self.read_segment(seg)
     
     def __getitem__(self, segment_name):
         """Return a segment object as if we were a dictionary."""
         return self._segments[segment_name]
+        
+
+    def read_segment(self, segment_name):
+        """Return a new Segment object"""
+        return segment.Segment(self, segment_name)
+
+    def segment_names(self):
+        """Return the project's list of segment_names"""
+        return self.project['segment_names']
         
