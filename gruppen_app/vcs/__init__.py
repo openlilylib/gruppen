@@ -65,7 +65,15 @@ class VCSRepo(object):
         leading '* '.
         If local == False also return 'remote' branches.
         """
+        pass
 
+    @abstractmethod
+    def checkout(self, branch):
+        """
+        Try to checkout a branch.
+        """
+        pass
+        
     @abstractmethod
     def current_branch(self):
         """Return the name of the currently checked-out branch."""

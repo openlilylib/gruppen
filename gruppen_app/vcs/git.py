@@ -83,6 +83,14 @@ class GitRepo(vcs.VCSRepo):
         args.append('--color=never')
         return [line.strip() for line in self._run_command('branch', args)]
 
+    def checkout(self, branch):
+        """
+        Tries to checkout a branch.
+        Add '-q' option because git checkout will
+        return its confirmation message on stderr.
+        May raise a GitError exception"""
+        self._run_command('checkout', ['-q', branch])
+        
     def current_branch(self):
         """Return the name of the currently checked-out branch."""
         branch_ref = ''.join(self._run_command('symbolic-ref -q HEAD'))
