@@ -34,6 +34,7 @@ class SegmentGrid(object):
         self.vcs = self.project.vcs
         self._voices = {}
         self._completion = None
+        self.modified = False
         
 
     def __iter__(self):
