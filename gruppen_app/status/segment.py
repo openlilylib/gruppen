@@ -55,6 +55,22 @@ class Segment(object):
         """return a cleaned list of comma-separated entries"""
         return [entry.strip() for entry in input.split(',')]
         
+    def json(self):
+        """Return a JSON compatible representation.
+        Note that this is *not* a JSON object but
+        a dictionary that can easily be used in a JSON object."""
+        result = {}
+        result['status'] = self.status()
+        if self.deleted:
+            result['deleted-by'] = self.deleted_by
+        elif self.status() != 'not-done':
+            result['entered-by'] = self.meta_fields['entered-by']
+            result['entry-date'] = self.meta_fields['entry-date']
+            result['prooferad-by'] = self.meta_fields['proofread-by']
+            result['proof-date'] = self.meta_fields['proof-date']
+            
+        return result
+        
     def parse_file(self):
         """Analyse the file"""
         self.parse_meta_fields()
