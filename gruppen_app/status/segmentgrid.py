@@ -55,7 +55,9 @@ class SegmentGrid(object):
         self._voices[voice_name] = voicerow.VoiceRow(self, voice_name)
         
     def segment_names(self):
+        """Return the project's list of segment_names"""
         return self.project['segment_names']
 
     def voice_names(self):
+        """Return the project's list of voice_names"""
         return self.project['voice_names']
