@@ -26,6 +26,8 @@
 Row representing all segments in a voice
 """
 
+from __future__ import division
+
 import os
 
 import segment
@@ -37,6 +39,7 @@ class VoiceRow(object):
         self.project = self.owner.project
         self.vcs = self.project.vcs
         self._segments = {}
+        self._count = {}
         self._dir = os.path.join(self.project['paths']['music'], voice_name)
         
         for seg in self.segment_names():
@@ -46,7 +49,30 @@ class VoiceRow(object):
         """Return a segment object as if we were a dictionary."""
         return self._segments[segment_name]
         
-
+    def _calculate_statistics(self):
+        """Calculate and cache statistics for the row"""
+        states = {
+            'entered': 0, 
+            'reviewed': 0, 
+            'deleted': 0, 
+            'not-done': 0}
+        for seg in self._segments:
+            states[self._segments[seg].status()] += 1
+        self._count['total'] = self.project.segment_count()
+        self._count['valid'] = self._count['total'] - states['deleted']
+        self._count['entered'] = states['entered']
+        self._count['reviewed'] = states['reviewed']
+        self._count['deleted'] = states['deleted']
+        self._count['not-done'] = states['not-done']
+        self._count['completion'] = self._count['reviewed'] / self._count['valid'] * 100
+        
+        
+    def count(self, type):
+        """Return the number of segments of a given type"""
+        if not self._count:
+            self._calculate_statistics()
+        return self._count[type]
+        
     def read_segment(self, segment_name):
         """Return a new Segment object"""
         return segment.Segment(self, segment_name)
