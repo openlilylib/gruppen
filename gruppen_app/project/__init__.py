@@ -119,6 +119,11 @@ class Project(object):
             raise KeyError('Unknown path property {}'.format(path_property))
         return self['paths'][path_property][len(self['paths']['root'])+1:]
         
+    
+    def segment_count(self):
+        """Return the number of segments per row"""
+        return len(self['segment_names'])
+        
     def set_defaults(self):
         """Set default values to project configuration variables
         if they can't be read from project/structure.json"""
