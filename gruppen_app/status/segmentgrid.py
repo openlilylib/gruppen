@@ -33,8 +33,6 @@ class SegmentGrid(object):
         self.project = self.owner.project
         self.vcs = self.project.vcs
         self._voices = {}
-        self._voice_list = []
-        self._segment_list = []
         self._completion = None
         
 
@@ -43,4 +41,8 @@ class SegmentGrid(object):
         for v in self._voice_list:
             yield self.voices[v]
     
-        
+    def segment_names(self):
+        return self.project['segment_names']
+
+    def voice_names(self):
+        return self.project['voice_names']
