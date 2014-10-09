@@ -23,39 +23,20 @@
 # See http://www.gnu.org/licenses/ for more information.
 
 """
-Segment grid representing the progress states of all segments
+Row representing all segments in a voice
 """
 
-import voicerow
+import os
 
-class SegmentGrid(object):
-    """Represents the two-dimensional array of segments"""
-    def __init__(self, status):
-        self.owner = status
+class VoiceRow(object):
+    def __init__(self, segment_grid, voice_name):
+        self.owner = segment_grid
         self.project = self.owner.project
         self.vcs = self.project.vcs
-        self._voices = {}
-        self._completion = None
-        self.modified = False
-        
-
-    def __getitem__(self, voice_name):
-        """Return a VoiceRow as if we were a dictionary."""
-        return self._voices[voice_name]
-        
-    def __iter__(self):
-        """Iterate over voices in the order given by self._voice_list."""
-        for v in self._voice_list:
-            yield self.voices[v]
+        self._segments = {}
+        self._dir = os.path.join(self.project['paths']['music'], voice_name)
     
-    def add_voice(self, voice_name):
-        """Add a VoiceRow object and let it parse the directory"""
-        if not voice_name in self.voice_names():
-            self.project['voice_names'].append(voice_name)
-        self._voices[voice_name] = voicerow.VoiceRow(self, voice_name)
+    def __getitem__(self, segment_name):
+        """Return a segment object as if we were a dictionary."""
+        return self._segments[segment_name]
         
-    def segment_names(self):
-        return self.project['segment_names']
-
-    def voice_names(self):
-        return self.project['voice_names']
