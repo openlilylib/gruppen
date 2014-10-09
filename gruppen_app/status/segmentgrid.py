@@ -23,16 +23,19 @@
 # See http://www.gnu.org/licenses/ for more information.
 
 """
-Project status
+Segment grid representing the progress states of all segments
 """
 
-import segmentgrid
+class SegmentGrid(object):
+    """Represents the two-dimensional array of segments"""
+    def __init__(self, status):
+        self.owner = status
+        self.project = self.owner.project
+        self.vcs = self.project.vcs
+        self._voices = {}
+        self._voice_list = []
+        self._segment_list = []
+        self._completion = None
+        
 
-class Status(object):
-    """Represents the status of a repository, in terms of
-    completed segments and reservations etc."""
-    def __init__(self, project):
-        self.project = project
-        self.vcs = project.vcs
-        self._segment_grid = segmentgrid.SegmentGrid(self)
         
