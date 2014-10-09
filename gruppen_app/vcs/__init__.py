@@ -107,15 +107,15 @@ class VCSRepo(object):
         for line in lines:
             if line.startswith('parts/'):
                 basepath, sink = os.path.splitext(line)
-                part, segment = os.path.split(basepath)
-                part = part[6:]
+                voice, segment = os.path.split(basepath)
+                voice = voice[len(start_dir):]
                 
                 # if part is met for the first time:
-                if not part in self._deletions:
-                    self._deletions[part] = {}
+                if not voice in self._deletions:
+                    self._deletions[voice] = {}
                 
                 # assing the author to the deleted segment
-                self._deletions[part][segment] = deletor
+                self._deletions[voice][segment] = deletor
             elif not line:
                 # Empty lines don't count
                 continue
