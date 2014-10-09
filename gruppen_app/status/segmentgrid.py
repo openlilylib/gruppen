@@ -37,6 +37,10 @@ class SegmentGrid(object):
         self.modified = False
         
 
+    def __getitem__(self, voice_name):
+        """Return a VoiceRow as if we were a dictionary."""
+        return self._voices[voice_name]
+        
     def __iter__(self):
         """Iterate over voices in the order given by self._voice_list."""
         for v in self._voice_list:
