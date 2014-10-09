@@ -67,6 +67,15 @@ class VoiceRow(object):
         self._count['completion'] = self._count['reviewed'] / self._count['valid'] * 100
         
         
+    def completion_tuple(self):
+        """Return a tuple with strings for
+        - completion percentage
+        - reviewed segments
+        - total valid segments"""
+        return ('%.2f' % self.count('completion'), 
+                str(self.count('reviewed')), 
+                str(self.count('valid')))
+        
     def count(self, type):
         """Return the number of segments of a given type"""
         if not self._count:
