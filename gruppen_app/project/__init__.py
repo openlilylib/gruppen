@@ -29,6 +29,7 @@ import os
 import json
 import codecs
 import vcs
+import status
 
 # Project object
 class Project(object):
@@ -65,6 +66,8 @@ class Project(object):
                 self.set_defaults()
         else:
             self.set_defaults()
+        
+        self.status = status.Status(self)
         
     def __getitem__(self, property):
         """Return project property - as if Project were a dict object"""
