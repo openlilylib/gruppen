@@ -99,7 +99,7 @@ class VCSRepo(object):
         
         # definition in subclasses!
         import __main__
-        start_dir = __main__.project['paths']['music']
+        start_dir = __main__.project.rel_path('music') + '/'
         lines = self.deleted_files_with_deleters(start_dir)
         
         # preset name of commit author

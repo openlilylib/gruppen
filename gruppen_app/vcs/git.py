@@ -118,7 +118,7 @@ class GitRepo(vcs.VCSRepo):
         - files deleted by the commit
         - trailing empty line
         per commit."""
-        if not os.path.isdir(start_dir):
+        if not os.path.isdir(os.path.join(__main__.project['paths']['root'], start_dir)):
             raise vcs.VCSError("Starting directory for determining deleted files\n" +
                            "doesn't exist: {}".format(start_dir))
         return self._run_command('log  --diff-filter=DR --pretty=format:\'%an\' --name-only {start}'.format(start = start_dir))
