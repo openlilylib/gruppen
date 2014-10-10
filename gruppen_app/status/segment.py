@@ -59,8 +59,7 @@ class Segment(object):
         """Return a JSON compatible representation.
         Note that this is *not* a JSON object but
         a dictionary that can easily be used in a JSON object."""
-        result = {}
-        result['status'] = self.status()
+        result = {'status': self.status()}
         if self.deleted:
             result['deleted-by'] = self.deleted_by
         elif self.status() != 'not-done':
