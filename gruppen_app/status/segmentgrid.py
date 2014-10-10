@@ -26,7 +26,10 @@
 Segment grid representing the progress states of all segments
 """
 
+from __future__ import division
+
 import voicerow
+from collections import Counter
 
 class SegmentGrid(object):
     """Represents the two-dimensional array of segments"""
@@ -35,7 +38,7 @@ class SegmentGrid(object):
         self.project = self.owner.project
         self.vcs = self.project.vcs
         self._voices = {}
-        self._completion = None
+        self._completion = {}
         self.modified = False
         
 
@@ -53,6 +56,22 @@ class SegmentGrid(object):
         if not voice_name in self.voice_names():
             self.project['voice_names'].append(voice_name)
         self._voices[voice_name] = voicerow.VoiceRow(self, voice_name)
+        
+    def completion(self):
+        """Return a dictionary with statistical completion data"""
+        
+        # the dictionary is cached
+        if self._completion:
+            return self._completion
+        
+        for v in self._voices:
+            # "add" the completion dict values of the voice to the current one
+            self._completion = dict(Counter(self._completion) + Counter(self._voices[v].completion()))
+        
+        # recalculate the completion ratio
+        self._completion['completion'] = self._completion['reviewed'] / self._completion['valid'] * 100
+        return self._completion
+            
         
     def segment_names(self):
         """Return the project's list of segment_names"""

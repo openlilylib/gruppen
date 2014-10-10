@@ -66,6 +66,11 @@ class VoiceRow(object):
         self._count['not-done'] = states['not-done']
         self._count['completion'] = self._count['reviewed'] / self._count['valid'] * 100
         
+    def completion(self):
+        """Return a dictionary with statistical completion data."""
+        if not self._count:
+            self._calculate_statistics()
+        return self._count.copy()
         
     def completion_tuple(self):
         """Return a tuple with strings for
@@ -85,7 +90,7 @@ class VoiceRow(object):
     def to_json(self):
         """Return a JSON compatible representation of the part row."""
         result = {
-            'completion': self.completion_tuple(), 
+            'completion': self.completion(), 
             'segments': {}}
         for seg in self._segments:
             if self._segments[seg].status() != 'not-done':
