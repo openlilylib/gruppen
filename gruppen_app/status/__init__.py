@@ -28,6 +28,26 @@ Project status
 
 import segmentgrid
 
+# define empty dicts as globally available templates
+completion_entries = {
+        'total': None, 
+        'valid': None, 
+        'entered': None, 
+        'reviewed': None, 
+        'deleted': None, 
+        'not-done': None, 
+        'completion': None, 
+        }
+        
+segment_states = [
+        'entered', 
+        'reviewed', 
+        'deleted', 
+        'not-done', 
+        ]
+
+
+
 class Status(object):
     """Represents the status of a repository, in terms of
     completed segments and reservations etc."""
