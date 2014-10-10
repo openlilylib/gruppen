@@ -31,6 +31,7 @@ from __future__ import division
 import os
 
 import segment
+import status
 
 class VoiceRow(object):
     def __init__(self, segment_grid, voice_name):
@@ -58,6 +59,7 @@ class VoiceRow(object):
             'not-done': 0}
         for seg in self._segments:
             states[self._segments[seg].status()] += 1
+        self._count = status.completion_entries.copy()
         self._count['total'] = self.project.segment_count()
         self._count['valid'] = self._count['total'] - states['deleted']
         self._count['entered'] = states['entered']
