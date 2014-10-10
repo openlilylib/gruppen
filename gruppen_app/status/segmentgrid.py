@@ -28,6 +28,8 @@ Segment grid representing the progress states of all segments
 
 from __future__ import division
 
+import datetime
+
 import voicerow
 from collections import Counter
 
@@ -77,12 +79,65 @@ class SegmentGrid(object):
         # recalculate the completion ratio
         self._completion['completion'] = self._completion['reviewed'] / self._completion['valid'] * 100
         return self._completion
-            
+
+    def metadata(self):
+        return {
+            'dateTime': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), 
+            'voiceCount': self.voice_count(), 
+            'completion': self.completion(), 
+            'branch': self.vcs.current_branch(), 
+            'currentCommit': self.vcs.last_commit(), 
+            'totalCommits': self.vcs.total_commits(), 
+            'contributors': self.vcs.contributors(), 
+            'segmentsInfo': self.segments_info()
+            }
+
         
+    def segment_completion(self, segment_name):
+        """Return completion data for a vertical segment"""
+        states = {
+            'entered': 0, 
+            'reviewed': 0, 
+            'deleted': 0, 
+            'not-done': 0}
+        for v in self._voices:
+            states[self._voices[v][segment_name].status()] += 1
+
+        total = self.voice_count() - states['deleted']
+        processed = states['reviewed']
+        percentage = (processed / total * 100) if total > 0 else 100
+        
+        return ('%.2f' % percentage, 
+                str(processed), 
+                str(total))
+                
     def segment_names(self):
         """Return the project's list of segment_names"""
         return self.project['segment_names']
 
+    def segments_info(self):
+        """Return a list with name and completion info on all segments.
+        This has to be a list because"""
+        result = []
+        for seg in self.segment_names():
+            result.append({
+                'name': seg, 
+                'completion': self.segment_completion(seg)
+                })
+        return result
+        
+    def to_json(self):
+        """Return a dictionary with to_json() objects for all voices."""
+        result = [{'metadata': self.metadata()}]
+        
+#        for v in self._voices:
+#            result[v] = self._voices[v].to_json()
+        return result
+        
+    def voice_count(self):
+        """Return the number of voices in the project"""
+        return len(self._voices)
+        
     def voice_names(self):
         """Return the project's list of voice_names"""
         return self.project['voice_names']
