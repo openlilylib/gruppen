@@ -51,6 +51,12 @@ class SegmentGrid(object):
         for v in self._voice_list:
             yield self.voices[v]
     
+    def _add_dicts(self, a, b):
+        """Return the 'sum' of two dictionaries.
+        values for keys existing in both dicts are added,
+        otherwise the key will be added."""
+        return dict(Counter(a) + Counter(b))
+        
     def add_voice(self, voice_name):
         """Add a VoiceRow object and let it parse the directory"""
         if not voice_name in self.voice_names():
@@ -66,7 +72,7 @@ class SegmentGrid(object):
         
         for v in self._voices:
             # "add" the completion dict values of the voice to the current one
-            self._completion = dict(Counter(self._completion) + Counter(self._voices[v].completion()))
+            self._completion = self._add_dicts(self._completion, self._voices[v].completion())
         
         # recalculate the completion ratio
         self._completion['completion'] = self._completion['reviewed'] / self._completion['valid'] * 100
