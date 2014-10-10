@@ -82,14 +82,14 @@ class VoiceRow(object):
             self._calculate_statistics()
         return self._count[type]
         
-    def json(self):
+    def to_json(self):
         """Return a JSON compatible representation of the part row."""
         result = {
             'completion': self.completion_tuple(), 
             'segments': {}}
         for seg in self._segments:
             if self._segments[seg].status() != 'not-done':
-                result['segments'][seg] = self._segments[seg].json()
+                result['segments'][seg] = self._segments[seg].to_json()
         return result
 
     def read_segment(self, segment_name):

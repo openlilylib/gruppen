@@ -55,7 +55,7 @@ class Segment(object):
         """return a cleaned list of comma-separated entries"""
         return [entry.strip() for entry in input.split(',')]
         
-    def json(self):
+    def to_json(self):
         """Return a JSON compatible representation.
         Note that this is *not* a JSON object but
         a dictionary that can easily be used in a JSON object."""
