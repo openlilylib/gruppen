@@ -113,6 +113,10 @@ class Project(object):
         except Exception as e:
             raise Exception("Error reading properties file: {}".format(e))
 
+    def read_voices(self):
+        """Add all voices from the properties to the segment grid."""
+        self.status.grid().add_voices(self['voice_names'])
+        
     def rel_path(self, path_property):
         """Return the path of a property relative to root."""
         if not path_property in self['paths']:
