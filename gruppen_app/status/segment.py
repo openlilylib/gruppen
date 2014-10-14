@@ -34,8 +34,10 @@ class Segment(object):
     
     def __init__(self, voice_row, segment_name):
         self.owner = voice_row
+        self.voice_name = voice_row.voice_name
         self.name = segment_name
         self.segment_grid = self.owner.owner
+        self.status_obj = self.owner.status
         self.project = self.owner.project
         self.vcs = self.owner.vcs
         
