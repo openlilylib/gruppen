@@ -58,14 +58,14 @@ class VoiceRow(object):
             
         for seg in self._segments:
             states[self._segments[seg].status()] += 1
-        self._completion_data = status.completion_entries.copy()
-        self._completion_data['total'] = self.project.segment_count()
-        self._completion_data['valid'] = self._completion_data['total'] - states['deleted']
-        self._completion_data['entered'] = states['entered']
-        self._completion_data['reviewed'] = states['reviewed']
-        self._completion_data['deleted'] = states['deleted']
-        self._completion_data['not-done'] = states['not-done']
-        self._completion_data['completion'] = self._completion_data['reviewed'] / self._completion_data['valid'] * 100
+        self._completion_data = cd = status.completion_entries.copy()
+        cd['total'] = self.project.segment_count()
+        cd['valid'] = cd['total'] - states['deleted']
+        cd['entered'] = states['entered']
+        cd['reviewed'] = states['reviewed']
+        cd['deleted'] = states['deleted']
+        cd['not-done'] = states['not-done']
+        cd['completion'] = cd['reviewed'] / cd['valid'] * 100 if cd['valid'] > 0 else 100
         
     def completion(self):
         """Return a dictionary with statistical completion data."""
