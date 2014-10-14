@@ -43,6 +43,7 @@ class SegmentGrid(object):
         self.vcs = self.project.vcs
         self._voices = {}
         self._completion = {}
+        self._segments_completion = {}
         self.modified = False
         
 
@@ -98,22 +99,25 @@ class SegmentGrid(object):
         
     def segment_completion(self, segment_name):
         """Return completion data for a vertical segment"""
-        states = {
-            'entered': 0, 
-            'reviewed': 0, 
-            'deleted': 0, 
-            'not-done': 0}
-        for v in self._voices:
-            states[self._voices[v][segment_name].status()] += 1
-
-        total = self.voice_count() - states['deleted']
-        processed = states['reviewed']
-        percentage = (processed / total * 100) if total > 0 else 100
         
-        return ('%.2f' % percentage, 
-                str(processed), 
-                str(total))
-                
+        # data is cached
+        if segment_name in self._segments_completion:
+            return self._segments_completion[segment_name]
+            
+        # init new dict
+        self._segments_completion[segment_name] = sc = status.completion_entries.copy()
+        
+        # count status of segments
+        for v in self._voices:
+            sc[self._voices[v][segment_name].status()] += 1
+        
+        # calculate remaining values
+        sc['total'] = self.voice_count()
+        sc['valid'] = sc['total'] - sc['deleted']
+        sc['completion'] = sc['reviewed'] / sc['valid'] * 100 if sc['valid'] > 0 else 100
+
+        return sc
+
     def segment_names(self):
         """Return the project's list of segment_names"""
         return self.project['segment_names']
