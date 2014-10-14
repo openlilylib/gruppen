@@ -46,7 +46,6 @@ class Segment(object):
                                      self.name) + '.ily'
         if not os.path.isfile(self.filename):
             self.deleted = True
-            self.deleted_by = ''
         else:
             self.deleted = False        
             self.meta_fields = {}
@@ -56,6 +55,13 @@ class Segment(object):
     def comma_list(self, input):
         """return a cleaned list of comma-separated entries"""
         return [entry.strip() for entry in input.split(',')]
+    
+    def deleted_by(self):
+        """Return the name of the deleter of the segment file
+        or an empty string if it is not deleted."""
+        if not self.deleted:
+            return ''
+        return self.segment_grid.deleted_by(self.voice_name, self.name)
         
     def to_json(self):
         """Return a JSON compatible representation.
@@ -63,7 +69,7 @@ class Segment(object):
         a dictionary that can easily be used in a JSON object."""
         result = {'status': self.status()}
         if self.deleted:
-            result['deleted-by'] = self.deleted_by
+            result['deleted-by'] = self.deleted_by()
         elif self.status() != 'not-done':
             result['entered-by'] = self.meta_fields['entered-by']
             result['entry-date'] = self.meta_fields['entry-date']
