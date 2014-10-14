@@ -62,6 +62,10 @@ class Status(object):
         self._segment_grid = None
         self.time_stamp()
         
+    def date(self):
+        "Return the date part of self.time_stamp()."
+        return self.time_stamp()[:self.time_stamp().find('_')]
+        
     def grid(self):
         """Return the SegmentGrid object"""
         if not self._segment_grid:
