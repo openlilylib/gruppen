@@ -38,6 +38,11 @@ import project
 
 def main():
     global project
+    commandline.parser.add_argument(
+        '--prune-directory', 
+        action = 'store_true', 
+        help=("Remove JSON/HTML files from the same day, " +
+              "so there is at most one file per day."))
     args = commandline.parse()
     # try to open a project
     try:
@@ -50,7 +55,13 @@ def main():
     project.read_voices()
     
     # generate JSON data
-    print project.status.grid().to_json()
+    project.status.write_json()
+    
+    # optionally prune output directory
+    if args['prune_directory']:
+        project.status.prune_out_dir()
+        
+
 
 # ####################################
 # Finally launch the program
