@@ -140,6 +140,14 @@ class Project(object):
         self.properties['paths']['music'] = os.path.join(self.properties['paths']['root'], 'music')
         self.properties['paths']['status_output'] = os.path.join(self.properties['paths']['root'], 'status')
         
+        # read voice_names from actual directories
+        self.init_voice_names(self._voice_names_by_dirlist)
+        
+        #TODO: This hardcoded stuff has to be fixed (but no idea what could be a good default here ...)
+        self.init_segment_names(self._segment_names_as_int_range(91, zero_based = False))
+        
+        self.modified = True
+        
     def set_path(self, path, value):
         """Set a path property and set self.modified to False if property has changed.
         Throws a KeyError if the path property doesn't exist."""
