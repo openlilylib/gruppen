@@ -30,6 +30,7 @@ from __future__ import division
 
 from collections import Counter
 import datetime
+import json
 
 import voicerow
 import status
@@ -130,11 +131,11 @@ class SegmentGrid(object):
         
     def to_json(self):
         """Return a dictionary with to_json() objects for all voices."""
-        result = [{'metadata': self.metadata()}]
+        result = {'metadata': self.metadata()}
         
 #        for v in self._voices:
 #            result[v] = self._voices[v].to_json()
-        return result
+        return json.dumps(result, sort_keys = True, indent = 1)
         
     def voice_count(self):
         """Return the number of voices in the project"""
