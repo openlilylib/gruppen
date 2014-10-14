@@ -44,6 +44,7 @@ class SegmentGrid(object):
         self._voices = {}
         self._completion = {}
         self._segments_completion = {}
+        self._deletions = None
         self.modified = False
         
 
@@ -68,6 +69,11 @@ class SegmentGrid(object):
             self.project['voice_names'].append(voice_name)
         self._voices[voice_name] = voicerow.VoiceRow(self, voice_name)
         
+    def add_voices(self, voice_names):
+        """Add multiple VoiceRow objects, their names being passed as a list."""
+        for v in voice_names:
+            self.add_voice(v)
+        
     def completion(self):
         """Return a dictionary with statistical completion data"""
         
@@ -84,6 +90,19 @@ class SegmentGrid(object):
         self._completion['completion'] = self._completion['reviewed'] / self._completion['valid'] * 100
         return self._completion
 
+    def deleted_by(self, voice, segment):
+        """Return the name of the contributor who has deleted the given file.
+        Returns an empty string if the file hasn't been deleted or noone can
+        be reliably determined."""
+        if not self._deletions:
+            self._deletions = self.vcs.deletions()
+            # add empty records for voices without deleted files
+            for v in self.voice_names():
+                if not v in self._deletions:
+                    self._deletions[v] = {}
+            print json.dumps(self._deletions, sort_keys = True, indent = 2)
+        return self._deletions[voice][segment]
+        
     def metadata(self):
         return {
             'dateTime': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), 
@@ -133,13 +152,15 @@ class SegmentGrid(object):
                 })
         return result
 
-    def to_json(self):
+    def to_json(self, indent_level = 1):
         """Return a dictionary with to_json() objects for all voices."""
         result = {'metadata': self.metadata(), 
                   'data': {}}
         for v in self._voices:
             result['data'][v] = self._voices[v].to_json()
-        return json.dumps(result, sort_keys = True, indent = 1)
+        if indent_level < 0:
+            indent_level = None
+        return json.dumps(result, sort_keys = True, indent = indent_level)
         
     def voice_count(self):
         """Return the number of voices in the project"""

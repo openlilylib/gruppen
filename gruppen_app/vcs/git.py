@@ -34,18 +34,15 @@ class GitError(vcs.VCSError):
 
 class GitRepo(vcs.VCSRepo):
     
-    def __init__(self, directory):
-            
-        if not os.path.isdir(directory):
-            raise vcs.VCSError("Error opening repository {}: Does not exist.".format(directory))
-        self.root = directory
+    def __init__(self, project):
+        super(GitRepo, self).__init__(project)
+
         # test if Git is installed
         try:
             self.version = ''.join(self._run_command('--version'))
         except:
             raise vcs.VCSError("Git is not installed")
         
-        super(GitRepo, self).__init__()
     
     def _run_command(self, cmd, args = []): 
         """

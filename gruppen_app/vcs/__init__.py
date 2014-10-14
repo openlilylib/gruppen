@@ -43,7 +43,11 @@ class VCSRepo(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, project):
+        self.root = project['paths']['root']
+        if not os.path.isdir(self.root):
+            raise vcs.VCSError("Error opening repository {}: Does not exist.".format(self.root))
+        self.project = project
         self._deletions = {}
 
     @abstractmethod
@@ -98,18 +102,21 @@ class VCSRepo(object):
         together with their deleters."""
         
         # definition in subclasses!
-        import __main__
-        start_dir = __main__.project.rel_path('music') + '/'
+        start_dir = self.project.rel_path('music') + '/'
         lines = self.deleted_files_with_deleters(start_dir)
         
         # preset name of commit author
         deletor = ''
         for line in lines:
-            if line.startswith('parts/'):
+            if line.startswith(start_dir):
                 basepath, sink = os.path.splitext(line)
                 voice, segment = os.path.split(basepath)
                 voice = voice[len(start_dir):]
                 
+                # ignore files not in subdirs
+                if not voice:
+                    continue
+                    
                 # if part is met for the first time:
                 if not voice in self._deletions:
                     self._deletions[voice] = {}
@@ -154,15 +161,15 @@ class VCSRepo(object):
 
 
 
-def open(repository):
+def open(project):
     """Determine if the given directory is a repository
     of a supported VCS tool and return a corresponding
     VCSRepo subclass object."""
-    
+    repository = project['paths']['root']
     if not os.path.isdir(repository):
         raise VCSError("Error opening directory {}.\nDoes not exist.".format(repository))
     for t in repo_test_functions:
-        repo_object = repo_test_functions[t](repository)
+        repo_object = repo_test_functions[t](project)
         if repo_object:
             return repo_object
     raise VCSError("Error opening directory {}.\n" +
@@ -170,11 +177,12 @@ def open(repository):
 
 
 # functions to test for repositories of supported VCSs
-def test_git(directory):
+def test_git(project):
     """Return a GitRepo object if directory is a Git repository"""
+    directory = project['paths']['root']
     if os.path.isdir(os.path.join(directory, '.git')):
         import git
-        return git.GitRepo(directory)
+        return git.GitRepo(project)
 
 repo_test_functions = {
     'Git': test_git}

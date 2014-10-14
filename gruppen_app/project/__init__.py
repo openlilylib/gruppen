@@ -49,7 +49,7 @@ class Project(object):
         self.properties['paths']['root'] = os.path.normpath(directory)
 
         # check if we're in a VCS repository and create VCS object
-        self.vcs = vcs.open(self.properties['paths']['root'])
+        self.vcs = vcs.open(self)
         
         # set/determine information on the project directory structure.
         # If the file project/properties.json is present it is parsed,
@@ -113,6 +113,10 @@ class Project(object):
         except Exception as e:
             raise Exception("Error reading properties file: {}".format(e))
 
+    def read_voices(self):
+        """Add all voices from the properties to the segment grid."""
+        self.status.grid().add_voices(self['voice_names'])
+        
     def rel_path(self, path_property):
         """Return the path of a property relative to root."""
         if not path_property in self['paths']:
@@ -136,6 +140,14 @@ class Project(object):
         self.properties['paths']['music'] = os.path.join(self.properties['paths']['root'], 'music')
         self.properties['paths']['status_output'] = os.path.join(self.properties['paths']['root'], 'status')
         
+        # read voice_names from actual directories
+        self.init_voice_names(self._voice_names_by_dirlist)
+        
+        #TODO: This hardcoded stuff has to be fixed (but no idea what could be a good default here ...)
+        self.init_segment_names(self._segment_names_as_int_range(91, zero_based = False))
+        
+        self.modified = True
+        
     def set_path(self, path, value):
         """Set a path property and set self.modified to False if property has changed.
         Throws a KeyError if the path property doesn't exist."""
@@ -157,6 +169,10 @@ class Project(object):
         if old != value:
                 self.modified = True
                 self.properties[property] = value
+        
+    def voice_count(self):
+        """Return the number of voices in the project"""
+        return len(self['voice_names'])
         
     def write_properties_to_json(self, ):
         """Write the project properties to a JSON file."""
