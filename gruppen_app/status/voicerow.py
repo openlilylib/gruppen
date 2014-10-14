@@ -40,7 +40,7 @@ class VoiceRow(object):
         self.project = self.owner.project
         self.vcs = self.project.vcs
         self._segments = {}
-        self._count = {}
+        self._completion_data = {}
         self._dir = os.path.join(self.project['paths']['music'], voice_name)
         
         for seg in self.segment_names():
@@ -52,27 +52,26 @@ class VoiceRow(object):
         
     def _calculate_statistics(self):
         """Calculate and cache statistics for the row"""
-        states = {
-            'entered': 0, 
-            'reviewed': 0, 
-            'deleted': 0, 
-            'not-done': 0}
+        states = {}
+        for s in status.segment_states:
+            state[s] = 0
+            
         for seg in self._segments:
             states[self._segments[seg].status()] += 1
-        self._count = status.completion_entries.copy()
-        self._count['total'] = self.project.segment_count()
-        self._count['valid'] = self._count['total'] - states['deleted']
-        self._count['entered'] = states['entered']
-        self._count['reviewed'] = states['reviewed']
-        self._count['deleted'] = states['deleted']
-        self._count['not-done'] = states['not-done']
-        self._count['completion'] = self._count['reviewed'] / self._count['valid'] * 100
+        self._completion_data = status.completion_entries.copy()
+        self._completion_data['total'] = self.project.segment_count()
+        self._completion_data['valid'] = self._completion_data['total'] - states['deleted']
+        self._completion_data['entered'] = states['entered']
+        self._completion_data['reviewed'] = states['reviewed']
+        self._completion_data['deleted'] = states['deleted']
+        self._completion_data['not-done'] = states['not-done']
+        self._completion_data['completion'] = self._completion_data['reviewed'] / self._completion_data['valid'] * 100
         
     def completion(self):
         """Return a dictionary with statistical completion data."""
-        if not self._count:
+        if not self._completion_data:
             self._calculate_statistics()
-        return self._count.copy()
+        return self._completion_data.copy()
         
     def completion_tuple(self):
         """Return a tuple with strings for
@@ -85,9 +84,9 @@ class VoiceRow(object):
         
     def count(self, type):
         """Return the number of segments of a given type"""
-        if not self._count:
+        if not self._completion_data:
             self._calculate_statistics()
-        return self._count[type]
+        return self._completion_data[type]
         
     def to_json(self):
         """Return a JSON compatible representation of the part row."""
