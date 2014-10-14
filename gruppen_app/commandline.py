@@ -52,6 +52,15 @@ def create_parser():
         help=("Relative path to JSON file specifying project properties " +
               "(path etc.). Defaults to 'project/properties.json'. If such " +
               "a file is not present, default values are used."))
+    parser.add_argument('-V', '--verbosity', 
+        #TODO: Restrict to set of options, document in help
+        help = ("Detail level of information output."))
+    parser.add_argument('-l', '--logfile', 
+        help = ("Use the given logfile (relative to repository " +
+                "root) and append --verbose output to that."))
+    parser.add_argument('-m', '--mailto', 
+        help = ("Do not print any output but try to send the output " +
+                "of the script to the given email address"))
 
     # Make sure debugger options are recognized as valid. These are passed automatically
     # from PyDev in Eclipse to the inferior process.
