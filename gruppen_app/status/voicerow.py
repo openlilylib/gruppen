@@ -54,7 +54,7 @@ class VoiceRow(object):
         """Calculate and cache statistics for the row"""
         states = {}
         for s in status.segment_states:
-            state[s] = 0
+            states[s] = 0
             
         for seg in self._segments:
             states[self._segments[seg].status()] += 1
