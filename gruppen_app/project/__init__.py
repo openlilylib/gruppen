@@ -49,7 +49,7 @@ class Project(object):
         self.properties['paths']['root'] = os.path.normpath(directory)
 
         # check if we're in a VCS repository and create VCS object
-        self.vcs = vcs.open(self.properties['paths']['root'])
+        self.vcs = vcs.open(self)
         
         # set/determine information on the project directory structure.
         # If the file project/properties.json is present it is parsed,

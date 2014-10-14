@@ -43,7 +43,11 @@ class VCSRepo(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, project):
+        self.root = project['paths']['root']
+        if not os.path.isdir(self.root):
+            raise vcs.VCSError("Error opening repository {}: Does not exist.".format(self.root))
+        self.project = project
         self._deletions = {}
 
     @abstractmethod
@@ -158,15 +162,15 @@ class VCSRepo(object):
 
 
 
-def open(repository):
+def open(project):
     """Determine if the given directory is a repository
     of a supported VCS tool and return a corresponding
     VCSRepo subclass object."""
-    
+    repository = project['paths']['root']
     if not os.path.isdir(repository):
         raise VCSError("Error opening directory {}.\nDoes not exist.".format(repository))
     for t in repo_test_functions:
-        repo_object = repo_test_functions[t](repository)
+        repo_object = repo_test_functions[t](project)
         if repo_object:
             return repo_object
     raise VCSError("Error opening directory {}.\n" +
@@ -174,11 +178,12 @@ def open(repository):
 
 
 # functions to test for repositories of supported VCSs
-def test_git(directory):
+def test_git(project):
     """Return a GitRepo object if directory is a Git repository"""
+    directory = project['paths']['root']
     if os.path.isdir(os.path.join(directory, '.git')):
         import git
-        return git.GitRepo(directory)
+        return git.GitRepo(project)
 
 repo_test_functions = {
     'Git': test_git}
