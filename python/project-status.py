@@ -45,9 +45,12 @@ def main():
     except AssertionError, e:
         print '\n', e, '\n'
         sys.exit(1)
- 
     
-    print project.status.time_stamp()
+    # add all present voices
+    project.read_voices()
+    
+    # generate JSON data
+    print project.status.grid().to_json()
 
 # ####################################
 # Finally launch the program
