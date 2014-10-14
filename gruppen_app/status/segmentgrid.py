@@ -31,7 +31,7 @@ from __future__ import division
 import datetime
 
 import voicerow
-from collections import Counter
+import status
 
 class SegmentGrid(object):
     """Represents the two-dimensional array of segments"""
@@ -72,6 +72,7 @@ class SegmentGrid(object):
         if self._completion:
             return self._completion
         
+        self._completion = status.completion_entries.copy()
         for v in self._voices:
             # "add" the completion dict values of the voice to the current one
             self._completion = self._add_dicts(self._completion, self._voices[v].completion())
