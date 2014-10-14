@@ -26,6 +26,8 @@
 Project status
 """
 
+import datetime
+
 import segmentgrid
 
 # define empty dicts as globally available templates
@@ -52,7 +54,17 @@ class Status(object):
     """Represents the status of a repository, in terms of
     completed segments and reservations etc."""
     def __init__(self, project):
+        self._time_stamp = ''
         self.project = project
         self.vcs = project.vcs
         self._segment_grid = segmentgrid.SegmentGrid(self)
+        self.time_stamp()
+        
+    def time_stamp(self):
+        """Return the UTC timestamp of the data
+        formatted to be used in a filename.
+        Will only be generated once, after parsing the segment grid."""
+        if not self._time_stamp:
+            self._time_stamp = datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S')
+        return self._time_stamp
         
