@@ -30,13 +30,13 @@ import segmentgrid
 
 # define empty dicts as globally available templates
 completion_entries = {
-        'total': None, 
-        'valid': None, 
-        'entered': None, 
-        'reviewed': None, 
-        'deleted': None, 
-        'not-done': None, 
-        'completion': None, 
+        'total': 0, 
+        'valid': 0, 
+        'entered': 0, 
+        'reviewed': 0, 
+        'deleted': 0, 
+        'not-done': 0, 
+        'completion': 0, 
         }
         
 segment_states = [
