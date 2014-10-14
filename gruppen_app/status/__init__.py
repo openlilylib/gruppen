@@ -57,8 +57,14 @@ class Status(object):
         self._time_stamp = ''
         self.project = project
         self.vcs = project.vcs
-        self._segment_grid = segmentgrid.SegmentGrid(self)
+        self._segment_grid = None
         self.time_stamp()
+        
+    def grid(self):
+        """Return the SegmentGrid object"""
+        if not self._segment_grid:
+            self._segment_grid = segmentgrid.SegmentGrid(self)
+        return self._segment_grid
         
     def time_stamp(self):
         """Return the UTC timestamp of the data
