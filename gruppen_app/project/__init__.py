@@ -162,6 +162,10 @@ class Project(object):
                 self.modified = True
                 self.properties[property] = value
         
+    def voice_count(self):
+        """Return the number of voices in the project"""
+        return len(self['voice_names'])
+        
     def write_properties_to_json(self, ):
         """Write the project properties to a JSON file."""
         try:
