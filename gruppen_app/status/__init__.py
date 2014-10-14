@@ -72,6 +72,19 @@ class Status(object):
             self._segment_grid = segmentgrid.SegmentGrid(self)
         return self._segment_grid
         
+    def prune_out_dir(self):
+        """Remove any existing JSON/HTML files from the same day
+        as the current one."""
+        # do nothing if we haven't written a JSON file yet
+        if not self._json_filename:
+            return
+        out_dir, current_filename = os.path.split(self._json_filename)
+        date = self.date()
+        for f in os.listdir(out_dir):
+            # find and remove files from the same day but with a different timestamp
+            if f.startswith(date) and f != current_filename:
+                os.remove(os.path.join(out_dir, f))
+        
     def time_stamp(self):
         """Return the UTC timestamp of the data
         formatted to be used in a filename.
