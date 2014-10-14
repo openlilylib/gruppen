@@ -27,6 +27,7 @@ Project status
 """
 
 import datetime
+import os
 
 import segmentgrid
 
@@ -55,6 +56,7 @@ class Status(object):
     completed segments and reservations etc."""
     def __init__(self, project):
         self._time_stamp = ''
+        self._json_filename = ''
         self.project = project
         self.vcs = project.vcs
         self._segment_grid = None
@@ -73,4 +75,21 @@ class Status(object):
         if not self._time_stamp:
             self._time_stamp = datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S')
         return self._time_stamp
+        
+    def write_json(self, out_dir = None):
+        """Write status to JSON file."""
+        if not out_dir:
+            out_dir = self.project['paths']['status_output']
+        if not os.path.isdir(out_dir):
+            os.mkdir(out_dir)
+        self._json_filename = os.path.join(out_dir, self.time_stamp() + '.json')
+        json_data = self.grid().to_json()
+        try:
+            f = open(self._json_filename, 'w')
+            f.write(json_data)
+            f.close()
+            print "JSON written to", self._json_filename
+        except Exception as e:
+            print 'Exception while writing to JSON file'
+            print e
         
