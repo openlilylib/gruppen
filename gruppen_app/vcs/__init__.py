@@ -110,6 +110,10 @@ class VCSRepo(object):
                 voice, segment = os.path.split(basepath)
                 voice = voice[len(start_dir):]
                 
+                # ignore files not in subdirs
+                if not voice:
+                    continue
+                    
                 # if part is met for the first time:
                 if not voice in self._deletions:
                     self._deletions[voice] = {}
