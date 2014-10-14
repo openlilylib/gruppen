@@ -28,6 +28,7 @@ Segment grid representing the progress states of all segments
 
 from __future__ import division
 
+from collections import Counter
 import datetime
 
 import voicerow
