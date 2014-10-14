@@ -37,6 +37,7 @@ class VoiceRow(object):
     def __init__(self, segment_grid, voice_name):
         self.owner = segment_grid
         self.voice_name = voice_name
+        self.status = self.owner.owner
         self.project = self.owner.project
         self.vcs = self.project.vcs
         self._segments = {}
