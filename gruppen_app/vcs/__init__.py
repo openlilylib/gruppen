@@ -102,14 +102,13 @@ class VCSRepo(object):
         together with their deleters."""
         
         # definition in subclasses!
-        import __main__
-        start_dir = __main__.project.rel_path('music') + '/'
+        start_dir = self.project.rel_path('music') + '/'
         lines = self.deleted_files_with_deleters(start_dir)
         
         # preset name of commit author
         deletor = ''
         for line in lines:
-            if line.startswith('parts/'):
+            if line.startswith(start_dir):
                 basepath, sink = os.path.splitext(line)
                 voice, segment = os.path.split(basepath)
                 voice = voice[len(start_dir):]
