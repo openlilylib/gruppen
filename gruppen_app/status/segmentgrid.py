@@ -68,6 +68,11 @@ class SegmentGrid(object):
             self.project['voice_names'].append(voice_name)
         self._voices[voice_name] = voicerow.VoiceRow(self, voice_name)
         
+    def add_voices(self, voice_names):
+        """Add multiple VoiceRow objects, their names being passed as a list."""
+        for v in voice_names:
+            self.add_voice(v)
+        
     def completion(self):
         """Return a dictionary with statistical completion data"""
         
