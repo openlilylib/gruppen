@@ -132,13 +132,13 @@ class SegmentGrid(object):
                 'completion': self.segment_completion(seg)
                 })
         return result
-        
+
     def to_json(self):
         """Return a dictionary with to_json() objects for all voices."""
-        result = {'metadata': self.metadata()}
-        
-#        for v in self._voices:
-#            result[v] = self._voices[v].to_json()
+        result = {'metadata': self.metadata(), 
+                  'data': {}}
+        for v in self._voices:
+            result['data'][v] = self._voices[v].to_json()
         return json.dumps(result, sort_keys = True, indent = 1)
         
     def voice_count(self):
