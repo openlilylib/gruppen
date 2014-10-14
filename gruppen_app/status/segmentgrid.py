@@ -44,6 +44,7 @@ class SegmentGrid(object):
         self._voices = {}
         self._completion = {}
         self._segments_completion = {}
+        self._deletions = None
         self.modified = False
         
 
@@ -89,6 +90,19 @@ class SegmentGrid(object):
         self._completion['completion'] = self._completion['reviewed'] / self._completion['valid'] * 100
         return self._completion
 
+    def deleted_by(self, voice, segment):
+        """Return the name of the contributor who has deleted the given file.
+        Returns an empty string if the file hasn't been deleted or noone can
+        be reliably determined."""
+        if not self._deletions:
+            self._deletions = self.vcs.deletions()
+            # add empty records for voices without deleted files
+            for v in self.voice_names():
+                if not v in self._deletions:
+                    self._deletions[v] = {}
+            print json.dumps(self._deletions, sort_keys = True, indent = 2)
+        return self._deletions[voice][segment]
+        
     def metadata(self):
         return {
             'dateTime': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), 
