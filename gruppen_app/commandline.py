@@ -33,6 +33,7 @@ import os
 import argparse
 
 import info
+import script
 
 # instantiate command line parser
 parser = None
@@ -85,5 +86,8 @@ def parse():
         args = args[2:]
     else:
         args = args[1:]
-    return vars(parser.parse_args(args))
-        
+    args = vars(parser.parse_args(args))
+    
+    script.set_verbosity(args['verbosity'])   
+    
+    return args
