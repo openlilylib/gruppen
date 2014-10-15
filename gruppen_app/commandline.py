@@ -53,7 +53,8 @@ def create_parser():
               "(path etc.). Defaults to 'project/properties.json'. If such " +
               "a file is not present, default values are used."))
     parser.add_argument('-V', '--verbosity', 
-        #TODO: Restrict to set of options, document in help
+        default = 'default', 
+        choices = ['debug', 'verbose', 'default', 'quiet', 'mute'], 
         help = ("Detail level of information output."))
     parser.add_argument('-l', '--logfile', 
         help = ("Use the given logfile (relative to repository " +
