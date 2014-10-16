@@ -27,6 +27,9 @@ Global variables and status information for the Python script.
 Parallel to the app module which (differently) contains PyQt.QApplication() specific data.
 """
 
+# #########
+# Verbosity
+
 # Verbosity level constants
 VERBOSITY_QUIET = 0
 VERBOSITY_ERROR = 1
@@ -54,6 +57,14 @@ def set_verbosity(argument):
     
     verbosity_level = verbosity_levels[argument]
 
+def verbosity():
+    """Return the string representing the verbosity of the script"""
+    for key, value in verbosity_levels.items():
+        if value == verbosity_level:
+            return key
+
+# #####################
+# Global Project object
 
 # globally available project object
 proj = None
