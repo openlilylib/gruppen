@@ -69,6 +69,17 @@ def exit_handler():
 
 atexit.register(exit_handler)
 
+# global handler for uncaught exceptions:
+import report
+def global_exception_handler(exctype, value, traceback):
+    error("There has been an unhandled exception. " +
+          "Its message is:\n" + value +
+          "\nTraceback:\n" +
+          traceback)
+    sys.exit(1)
+
+sys.excepthook = global_exception_handler
+
 # Preparing and finishing a repository
 
 current_branch = ''
