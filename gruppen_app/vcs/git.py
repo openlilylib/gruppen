@@ -123,6 +123,13 @@ class GitRepo(vcs.VCSRepo):
                            "doesn't exist: {}".format(start_dir))
         return self._run_command('log  --diff-filter=DR --pretty=format:\'%an\' --name-only {start}'.format(start = start_dir))
 
+    def is_clean(self):
+        """Return True if the repository is clean"""
+        if self._run_command('status --porcelain'):
+            return False
+        else:
+            return True
+        
     def last_commit(self):
         """Return a short log entry for the last commit."""
         return ''.join(self._run_command('log -1 --pretty=oneline --abbrev-commit'))

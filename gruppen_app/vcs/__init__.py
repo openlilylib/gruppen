@@ -137,6 +137,11 @@ class VCSRepo(object):
 
         
     @abstractmethod
+    def is_clean(self):
+        """Return True if the repository is clean"""
+        pass
+
+    @abstractmethod
     def last_commit(self):
         """Return a short log entry for the last commit."""
         pass
