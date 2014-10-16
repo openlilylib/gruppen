@@ -36,15 +36,20 @@ import init
 import commandline
 import project
 import script
+from report import *
 
 def main():
+    
+    info('Gruppen - project-status\n')
+    info('Generate status information about a Crowd-Editing project')
+    
     commandline.parser.add_argument(
         '--prune-directory', 
         action = 'store_true', 
         help=("Remove JSON/HTML files from the same day, " +
               "so there is at most one file per day."))
     args = commandline.parse()
-    
+        
     proj = script.open_project(args)
     
     # add all present voices
