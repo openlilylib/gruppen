@@ -89,8 +89,13 @@ def prepare_repository(vcs):
     current_branch = vcs.current_branch()
     if current_branch != 'master':
         changed_branch = True
-        stashed = vcs.stash()
-        vcs.checkout('master')
-        vcs.pull()
-    
+        try:
+            stashed = vcs.stash()
+            vcs.checkout('master')
+            vcs.pull()
+        except Exception,  e:
+            error('There has been a problem preparing the repository:\n{}\n' 
+                  'Please check the repository carefully!\n'.format(e))
+            finish_repository(proj.vcs)
+            sys.exit(1)
 

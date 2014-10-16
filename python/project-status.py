@@ -54,14 +54,8 @@ def main():
     proj = script.open_project(args)
     
     # ensure the repo is in the right state
-    try:
-        init.prepare_repository(proj.vcs)
-    except Exception,  e:
-        error('There has been a problem preparing the repository:\n{}\n' 
-              'Please check the repository carefully!\n'.format(e))
-        init.finish_repository(proj.vcs)
-        sys.exit(1)
-
+    init.prepare_repository(proj.vcs)
+ 
     try:
         # add all present voices
         proj.read_voices()
