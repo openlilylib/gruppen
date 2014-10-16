@@ -82,7 +82,7 @@ class Project(object):
         """Return the absolute path of a path property."""
         if not path_property in self['paths']:
             raise KeyError('Unknown path property {}'.format(path_property))
-        return os.path.join(self['paths']['root'], path_property)
+        return os.path.join(self['paths']['root'], self['paths'][path_property])
         
     def init_segment_names(self, segs):
         """Populate the list of segment names.
