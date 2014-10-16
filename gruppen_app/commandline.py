@@ -63,6 +63,12 @@ def create_parser():
     parser.add_argument('-m', '--mailto', 
         help = ("Do not print any output but try to send the output " +
                 "of the script to the given email address"))
+    parser.add_argument(
+        '-t', '--target-directory', 
+        help = ("directory where the JSON/HTML file will be " +
+                "saved to (will be created if it doesn't exist). " +
+                "accepts absolute or relative paths"))
+                
 
     # Make sure debugger options are recognized as valid. These are passed automatically
     # from PyDev in Eclipse to the inferior process.

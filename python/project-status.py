@@ -49,12 +49,6 @@ def main():
         help=("Remove JSON/HTML files from the same day, " +
               "so there is at most one file per day."))
     
-    commandline.parser.add_argument(
-        '-t', '--target-directory', 
-        help = ("directory where the JSON/HTML file will be " +
-                "saved to (will be created if it doesn't exist). " +
-                "accepts absolute or relative paths"))
-                
     args = commandline.parse()
         
     proj = script.open_project(args)
