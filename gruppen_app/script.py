@@ -27,8 +27,26 @@ Global variables and status information for the Python script.
 Parallel to the app module which (differently) contains PyQt.QApplication() specific data.
 """
 
+import os
+
 from report import *
 
+# Target directory
+target_directory = ''
+
+def absolute_path(directory):
+    """Return an absolute path to directory.
+    If directory is empty, use current working directory.
+    If it's an absolute path, simply return it.
+    If it's a relative path, interpret that starting with the cwd."""
+    if not directory:
+        return os.getcwd()
+    elif not os.path.isabs(directory):
+        return os.path.normpath(os.path.join(os.getcwd(), directory))
+    else:
+        return directory
+
+    
 # #########
 # Verbosity
 

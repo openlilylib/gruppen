@@ -25,11 +25,12 @@
 """
 Project properties
 """
-import os
+import os, sys
 import json
 import codecs
 import vcs
 import status
+import script
 from report import *
 
 # Project object
@@ -42,12 +43,9 @@ class Project(object):
         self.modified = False
         
         # determine project root directory
-        directory = args['directory']        
-        if not directory:
-            directory = os.getcwd()
-        elif not os.path.isabs(directory):
-            directory = os.path.join(os.getcwd(), directory)
-        self.properties['paths']['root'] = os.path.normpath(directory)
+        # (has to use intermediate variable because that's used later)
+        directory = script.absolute_path(args['directory'])
+        self.properties['paths']['root'] = directory
         
         info('Opening project {}'.format(self.properties['paths']['root']))
 
