@@ -134,6 +134,37 @@ class GitRepo(vcs.VCSRepo):
         """Return a short log entry for the last commit."""
         return ''.join(self._run_command('log -1 --pretty=oneline --abbrev-commit'))
 
+    def pull(self, remote = 'origin'):
+        """Pull from origin or the given remote"""
+        cmd = 'pull {}'.format(remote)
+        return self._run_command(cmd)
+        
+    def stash(self):
+        """Save the working tree to a stash.
+        Return True if actually something has been stashed.
+        (If not and you stash_pop afterwards, *another* stash is applied,
+        which usually doesn't work and is definitely not what you want."""
+        
+        # determine the position (committish) of the existing stash
+        old_stash = self._run_command('rev-parse -q --verify refs/stash')[0]
+        debug('Old stash: ' + old_stash)
+        
+        # do stash
+        self._run_command('stash save')
+        
+        # determine the new stash position
+        new_stash = self._run_command('rev-parse -q --verify refs/stash')[0]
+        debug('New stash: ' + new_stash)
+        
+        # if the two states are identical we didn't actually stash anything.
+        result = new_stash != old_stash
+        debug('Has stashed: {}'.format(result))
+        return result
+    
+    def stash_pop(self):
+        """Reapply stashed changes and drop the stash"""
+        return self._run_command('stash pop')
+    
     def total_commits(self):
         """Return the number of commits leading to the current state."""
         return self._run_command('log --oneline | wc -l')

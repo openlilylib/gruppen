@@ -147,10 +147,22 @@ class VCSRepo(object):
         pass
 
     @abstractmethod
+    def pull(self, remote = 'origin'):
+        """Pull from 'origin' or the given remote"""
+        
+    @abstractmethod
     def total_commits(self):
         """Return the number of commits leading to the current state."""
     pass
 
+    @abstractmethod
+    def stash(self):
+        """Save the working tree to a stash"""
+        
+    @abstractmethod
+    def stash_pop(self):
+        """Reapply and drop the stash"""
+        
     def who_deleted(self, part, segment):
         #TODO: This has to be generalized together with
         #generalizing the repo structure itself
