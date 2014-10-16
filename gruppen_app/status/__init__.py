@@ -30,6 +30,7 @@ import datetime
 import os
 
 import segmentgrid
+from report import *
 
 # define empty dicts as globally available templates
 completion_entries = {
@@ -55,6 +56,9 @@ class Status(object):
     """Represents the status of a repository, in terms of
     completed segments and reservations etc."""
     def __init__(self, project):
+        
+        chat('Create Status() object')
+        
         self._time_stamp = ''
         self._json_filename = ''
         self.project = project
@@ -78,11 +82,17 @@ class Status(object):
         # do nothing if we haven't written a JSON file yet
         if not self._json_filename:
             return
+        
+        info('Prune output dir (remove previous files from today)')
+        
         out_dir, current_filename = os.path.split(self._json_filename)
         date = self.date()
         for f in os.listdir(out_dir):
             # find and remove files from the same day but with a different timestamp
             if f.startswith(date) and f != current_filename:
+                
+                chat('Remove {}'.format(current_filename))
+                
                 os.remove(os.path.join(out_dir, f))
         
     def time_stamp(self):
@@ -101,11 +111,13 @@ class Status(object):
             os.mkdir(out_dir)
         self._json_filename = os.path.join(out_dir, self.time_stamp() + '.json')
         json_data = self.grid().to_json(indent)
+        
+        info('Write grid data to {}'.format(self._json_filename))
+        
         try:
             f = open(self._json_filename, 'w')
             f.write(json_data)
             f.close()
-            print "JSON written to", self._json_filename
         except Exception as e:
             print 'Exception while writing to JSON file'
             print e

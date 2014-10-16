@@ -27,7 +27,7 @@ import subprocess
 
 import vcs
 import script
-
+from report import *
 
 class GitError(vcs.VCSError):
     pass
@@ -57,6 +57,9 @@ class GitRepo(vcs.VCSRepo):
             cmd.append(args)
         else:
             cmd.extend(args)
+        
+        chat('Executing Git command: {}'.format(' '.join(cmd)))
+        
         pr = subprocess.Popen(' '.join(cmd), cwd = self.root, 
                               shell = True, 
                               stdout = subprocess.PIPE, 

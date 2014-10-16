@@ -32,9 +32,12 @@ import os
 
 import segment
 import status
+from report import *
 
 class VoiceRow(object):
     def __init__(self, segment_grid, voice_name):
+        info('Read voice {}'.format(voice_name))
+        
         self.owner = segment_grid
         self.voice_name = voice_name
         self.status = self.owner.owner
@@ -54,6 +57,9 @@ class VoiceRow(object):
     def _calculate_statistics(self):
         """Calculate and cache statistics for the row"""
         states = {}
+        
+        debug('Calculate statistics for {}'.format(self.voice_name))
+        
         for s in status.segment_states:
             states[s] = 0
             
@@ -91,6 +97,9 @@ class VoiceRow(object):
         
     def to_json(self):
         """Return a JSON compatible representation of the part row."""
+        
+        chat('Generate JSON for voice {}'.format(self.voice_name))
+        
         result = {
             'completion': self.completion(), 
             'segments': {}}

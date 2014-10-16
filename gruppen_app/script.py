@@ -27,6 +27,8 @@ Global variables and status information for the Python script.
 Parallel to the app module which (differently) contains PyQt.QApplication() specific data.
 """
 
+from report import *
+
 # #########
 # Verbosity
 
@@ -78,6 +80,6 @@ def open_project(args):
         proj = Project(args)
         return proj
     except AssertionError, e:
-        print '\n', e, '\n'
+        error(e)
         sys.exit(1)
 

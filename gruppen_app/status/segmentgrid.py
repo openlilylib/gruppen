@@ -34,10 +34,13 @@ import json
 
 import voicerow
 import status
+from report import *
 
 class SegmentGrid(object):
     """Represents the two-dimensional array of segments"""
     def __init__(self, status):
+        chat('Create SegmentGrid() object')
+        
         self.owner = status
         self.project = self.owner.project
         self.vcs = self.project.vcs
@@ -100,7 +103,7 @@ class SegmentGrid(object):
             for v in self.voice_names():
                 if not v in self._deletions:
                     self._deletions[v] = {}
-            print json.dumps(self._deletions, sort_keys = True, indent = 2)
+            debug(json.dumps(self._deletions, sort_keys = True, indent = 2))
         return self._deletions[voice][segment]
         
     def metadata(self):
@@ -154,6 +157,9 @@ class SegmentGrid(object):
 
     def to_json(self, indent_level = 1):
         """Return a dictionary with to_json() objects for all voices."""
+        
+        info('Generate JSON data for SegmentGrid()')
+        
         result = {'metadata': self.metadata(), 
                   'data': {}}
         for v in self._voices:

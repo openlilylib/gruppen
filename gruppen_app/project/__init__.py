@@ -30,6 +30,7 @@ import json
 import codecs
 import vcs
 import status
+from report import *
 
 # Project object
 class Project(object):
@@ -41,12 +42,14 @@ class Project(object):
         self.modified = False
         
         # determine project root directory
-        directory = args['directory']
+        directory = args['directory']        
         if not directory:
             directory = os.getcwd()
         elif not os.path.isabs(directory):
             directory = os.path.join(os.getcwd(), directory)
         self.properties['paths']['root'] = os.path.normpath(directory)
+        
+        info('Opening project {}'.format(self.properties['paths']['root']))
 
         # check if we're in a VCS repository and create VCS object
         self.vcs = vcs.open(self)
@@ -61,7 +64,7 @@ class Project(object):
             try:
                 self.read_properties_from_json()
             except Exception as e:
-                print ("{}\n" +
+                warn("{}\n" +
                        "Setting project structure to default values.").format(e)
                 self.set_defaults()
         else:
@@ -78,8 +81,12 @@ class Project(object):
         'segs' can be a callable that returns a list
         with segment names. Some possible functions are defined
         in the class."""
+        
+        chat('Populate list of segment names')
+        
         self.properties['segment_names'] =  [s for s in segs()] if callable(segs) else segs
-
+        debug(self.properties['segment_names'])
+        
     def _segment_names_as_int_range(self, upper, digits= 0 , zero_based = True):
         """Return a list of normalized integer segment names.
         'upper' is treated in the pythonic way (up to but not including).
@@ -96,7 +103,11 @@ class Project(object):
         'voices' can be a callable that returns a list
         with voice names. Some possible functions are defined
         in the class."""
+        
+        chat('Populate voice names')
+        
         self.properties['voice_names'] =  [v for v in voices()] if callable(voices) else voices
+        debug(self.properties['voice_names'])
     
     def _voice_names_by_dirlist(self):
         """Return a list of directories under ['music'] path."""
@@ -108,6 +119,8 @@ class Project(object):
     def read_properties_from_json(self):
         """Read a JSON file containing project properties."""
         try:
+            chat('Load project properties')
+            
             f = codecs.open(self.properties_file, 'r', 'utf-8')
             self.properties = json.loads(f.read())
         except Exception as e:
@@ -115,6 +128,9 @@ class Project(object):
 
     def read_voices(self):
         """Add all voices from the properties to the segment grid."""
+        
+        info('Load voices')
+        
         self.status.grid().add_voices(self['voice_names'])
         
     def rel_path(self, path_property):
@@ -123,7 +139,6 @@ class Project(object):
             raise KeyError('Unknown path property {}'.format(path_property))
         return self['paths'][path_property][len(self['paths']['root'])+1:]
         
-    
     def segment_count(self):
         """Return the number of segments per row"""
         return len(self['segment_names'])
@@ -131,6 +146,8 @@ class Project(object):
     def set_defaults(self):
         """Set default values to project configuration variables
         if they can't be read from project/structure.json"""
+        
+        chat('Set project properties to default values.')
         
         # set path to project description file
         self.properties['description_file'] = os.path.join(self.properties['paths']['root'], 'project', 'description.json')
@@ -178,6 +195,8 @@ class Project(object):
         """Write the project properties to a JSON file."""
         try:
             if self.modified:
+                info('Write project properties to {}'.format(self.properties_file)) 
+                
                 if not os.path.isdir(self['paths']['project_info']):
                     os.mkdir(self['paths']['project_info'])
                 
