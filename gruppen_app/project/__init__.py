@@ -58,11 +58,13 @@ class Project(object):
         # If the file project/properties.json is present it is parsed,
         # otherwise default values are used.
         
-        self.properties_file = args['properties_file'] if args['properties_file'] else os.path.join(
+        self.properties_file = os.path.join(self['paths']['root'], args['properties_file']) if args['properties_file'] else os.path.join(
                                self.properties['paths']['root'], 'project', 'properties.json')
         if os.path.isfile(self.properties_file):
             try:
                 self.read_properties_from_json()
+                # reinstall root directory (as this is not saved in the json file)
+                self['paths']['root'] = directory
             except Exception as e:
                 warn("{}\n" +
                        "Setting project structure to default values.").format(e)
@@ -75,6 +77,12 @@ class Project(object):
     def __getitem__(self, property):
         """Return project property - as if Project were a dict object"""
         return self.properties[property]
+        
+    def abs_path(self, path_property):
+        """Return the absolute path of a path property."""
+        if not path_property in self['paths']:
+            raise KeyError('Unknown path property {}'.format(path_property))
+        return os.path.join(self['paths']['root'], path_property)
         
     def init_segment_names(self, segs):
         """Populate the list of segment names.
@@ -133,12 +141,6 @@ class Project(object):
         
         self.status.grid().add_voices(self['voice_names'])
         
-    def rel_path(self, path_property):
-        """Return the path of a property relative to root."""
-        if not path_property in self['paths']:
-            raise KeyError('Unknown path property {}'.format(path_property))
-        return self['paths'][path_property][len(self['paths']['root'])+1:]
-        
     def segment_count(self):
         """Return the number of segments per row"""
         return len(self['segment_names'])
@@ -153,9 +155,9 @@ class Project(object):
         self.properties['description_file'] = os.path.join(self.properties['paths']['root'], 'project', 'description.json')
         
         # set paths (stored as absolute paths)
-        self.properties['paths']['project_info'] = os.path.join(self.properties['paths']['root'], 'project')
-        self.properties['paths']['music'] = os.path.join(self.properties['paths']['root'], 'music')
-        self.properties['paths']['status_output'] = os.path.join(self.properties['paths']['root'], 'status')
+        self.properties['paths']['project_info'] = 'project'
+        self.properties['paths']['music'] = 'music'
+        self.properties['paths']['status_output'] = 'status'
         
         # read voice_names from actual directories
         self.init_voice_names(self._voice_names_by_dirlist)

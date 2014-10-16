@@ -106,7 +106,7 @@ class Status(object):
     def write_json(self, out_dir = None, indent = 1):
         """Write status to JSON file."""
         if not out_dir:
-            out_dir = self.project['paths']['status_output']
+            out_dir = self.project.abs_path('status_output')
         if not os.path.isdir(out_dir):
             os.mkdir(out_dir)
         self._json_filename = os.path.join(out_dir, self.time_stamp() + '.json')

@@ -106,7 +106,7 @@ class VCSRepo(object):
         chat('Parse project for deleted files')
         
         # definition in subclasses!
-        start_dir = self.project.rel_path('music') + '/'
+        start_dir = self.project['paths']['music'] + '/'
         lines = self.deleted_files_with_deleters(start_dir)
         
         # preset name of commit author

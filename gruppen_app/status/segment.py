@@ -43,7 +43,8 @@ class Segment(object):
         self.project = self.owner.project
         self.vcs = self.owner.vcs
         
-        self.filename = os.path.join(self.project['paths']['music'], 
+        self.filename = os.path.join(self.project['paths']['root'], 
+                                     self.project['paths']['music'], 
                                      self.owner.voice_name, 
                                      self.name) + '.ily'
         if not os.path.isfile(self.filename):
