@@ -83,3 +83,14 @@ def open_project(args):
         error(e)
         sys.exit(1)
 
+def pretty_floats(obj):
+    """Format floating point numbers (recursively) as percentage strings.
+    Used for exporting completion data to JSON."""
+    if isinstance(obj, float):
+        return '{:.2%}'.format(obj / 100)
+    elif isinstance(obj, dict):
+        return dict((k, pretty_floats(v)) for k, v in obj.items())
+    elif isinstance(obj, (list, tuple)):
+        return map(pretty_floats, obj)             
+    return obj
+

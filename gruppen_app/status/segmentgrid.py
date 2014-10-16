@@ -35,6 +35,8 @@ import json
 import voicerow
 import status
 from report import *
+from script import pretty_floats
+
 
 class SegmentGrid(object):
     """Represents the two-dimensional array of segments"""
@@ -166,7 +168,7 @@ class SegmentGrid(object):
             result['data'][v] = self._voices[v].to_json()
         if indent_level < 0:
             indent_level = None
-        return json.dumps(result, sort_keys = True, indent = indent_level)
+        return json.dumps(pretty_floats(result), sort_keys = True, indent = indent_level)
         
     def voice_count(self):
         """Return the number of voices in the project"""
