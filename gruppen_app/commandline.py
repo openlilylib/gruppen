@@ -88,6 +88,7 @@ def parse():
         args = args[1:]
     args = vars(parser.parse_args(args))
     
+    # set the global verbosity level of the script
     script.set_verbosity(args['verbosity'])   
     
     # set external target directory if passed
