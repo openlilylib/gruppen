@@ -27,9 +27,35 @@
 Generic interface to report status and debug data 
 """
 
+import script 
 
 def debug(msg):
     """Report any data, depending on the command line configuration"""
+    if script.verbosity_level >= script.VERBOSITY_DEBUG:
+        print msg
+        print '---\n'
+
+def chat(msg):
+    """Print additional status information"""
+    if script.verbosity_level >= script.VERBOSITY_VERBOSE:
+        print msg
+        print '---\n'
+        
+def error(msg):
+    """Print an error message"""
+    if script.verbosity_level >= script.VERBOSITY_ERROR:
+        print "Error:\n", msg
+        print '---\n'
+
+def info(msg):
+    """Print a default information (e.g. progress of the script)."""
+    if script.verbosity_level >= script.VERBOSITY_DEFAULT:
+        print msg
+        print '---\n'
     
-    # Initial stub
-    print msg
+def warn(msg):
+    """Print a warning."""
+    if script.verbosity_level >= script.VERBOSITY_WARNING:
+        print 'Warning:\n', msg
+        print '---\n'
+    
