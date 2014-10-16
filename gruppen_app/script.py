@@ -50,3 +50,20 @@ def set_verbosity(argument):
         'verbose': VERBOSITY_VERBOSE, 
         'debug': VERBOSITY_DEBUG}
     verbosity_level = verbosity_levels[argument]
+
+
+# globally available project object
+proj = None
+
+def open_project(args):
+    """Create a Project() object, make it globally available and return it."""
+    global proj
+    # try to open a project
+    try:
+        from project import Project
+        proj = Project(args)
+        return proj
+    except AssertionError, e:
+        print '\n', e, '\n'
+        sys.exit(1)
+
