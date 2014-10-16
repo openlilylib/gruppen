@@ -193,18 +193,22 @@ class Project(object):
         """Return the number of voices in the project"""
         return len(self['voice_names'])
         
-    def write_properties_to_json(self, ):
+    def write_properties_to_json(self):
         """Write the project properties to a JSON file."""
         try:
             if self.modified:
                 info('Write project properties to {}'.format(self.properties_file)) 
                 
-                if not os.path.isdir(self['paths']['project_info']):
-                    os.mkdir(self['paths']['project_info'])
+                properties_dir = os.path.join(self['paths']['root'], 'project')
+                if not os.path.isdir(properties_dir):
+                    os.mkdir(properties_dir)
+                
+                # remove root dir from properties (won't be saved)
+                del self.properties['paths']['root']
                 
                 f = codecs.open(self.properties_file, 'w', 'utf-8')
-                f.write(json.dumps(self.properties))
+                f.write(json.dumps(self.properties, sort_keys = True, indent = 2))
                 f.close()
-        except OSerror as e:
+        except OSError as e:
             raise OSError("Error writing project properties to JSON file: {}".format(e))
         
