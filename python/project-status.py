@@ -53,16 +53,27 @@ def main():
         
     proj = script.open_project(args)
     
-    # add all present voices
-    proj.read_voices()
-    
-    # generate JSON data
-    proj.status.write_json()
-    
-    # optionally prune output directory
-    if args['prune_directory']:
-        proj.status.prune_out_dir()
+    # ensure the repo is in the right state
+    try:
+        init.prepare_repository(proj.vcs)
+    except Exception,  e:
+        error('There has been a problem preparing the repository:\n{}\n' 
+              'Please check the repository carefully!\n'.format(e))
+        init.finish_repository(proj.vcs)
+        sys.exit(1)
+
+    try:
+        # add all present voices
+        proj.read_voices()
         
+        # generate JSON data
+        proj.status.write_json()
+        
+        # optionally prune output directory
+        if args['prune_directory']:
+            proj.status.prune_out_dir()
+    finally:
+        init.finish_repository(proj.vcs)
 
 # ####################################
 # Finally launch the program

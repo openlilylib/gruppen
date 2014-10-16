@@ -68,4 +68,29 @@ def exit_handler():
         script.proj.write_properties_to_json()
 
 atexit.register(exit_handler)
+
+# Preparing and finishing a repository
+
+current_branch = ''
+changed_branch = False
+stashed = False
+
+def finish_repository(vcs):
+    """Check if we have modified the repository in the beginning
+    and reset it to its previous state if necessary."""
+    if current_branch:
+        vcs.checkout(current_branch)
+    if stashed:
+        vcs.stash_pop()
     
+def prepare_repository(vcs):
+    """Check the repository state and prepare execution."""
+    global current_branch, changed_branch, stashed
+    current_branch = vcs.current_branch()
+    if current_branch != 'master':
+        changed_branch = True
+        stashed = vcs.stash()
+        vcs.checkout('master')
+        vcs.pull()
+    
+
