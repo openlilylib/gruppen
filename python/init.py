@@ -64,7 +64,8 @@ import commandline
 # Finishing of the script
 import script
 def exit_handler():
-    script.proj.write_properties_to_json()
+    if script.proj:
+        script.proj.write_properties_to_json()
 
 atexit.register(exit_handler)
     
