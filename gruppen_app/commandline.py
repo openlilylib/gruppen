@@ -55,7 +55,7 @@ def create_parser():
               "a file is not present, default values are used."))
     parser.add_argument('-V', '--verbosity', 
         default = 'default', 
-        choices = ['debug', 'verbose', 'default', 'quiet', 'mute'], 
+        choices = ['debug', 'verbose', 'default', 'warning', 'error', 'quiet'], 
         help = ("Detail level of information output."))
     parser.add_argument('-l', '--logfile', 
         help = ("Use the given logfile (relative to repository " +

@@ -28,11 +28,12 @@ Parallel to the app module which (differently) contains PyQt.QApplication() spec
 """
 
 # Verbosity level constants
-VERBOSITY_MUTE = 0
-VERBOSITY_QUIET = 1
-VERBOSITY_DEFAULT = 2
-VERBOSITY_VERBOSE = 3
-VERBOSITY_DEBUG = 4
+VERBOSITY_QUIET = 0
+VERBOSITY_ERROR = 1
+VERBOSITY_WARNING = 2
+VERBOSITY_DEFAULT = 3
+VERBOSITY_VERBOSE = 4
+VERBOSITY_DEBUG = 5
 
 # Verbosity level of the script
 verbosity_level = VERBOSITY_DEFAULT
@@ -44,8 +45,9 @@ def set_verbosity(argument):
     global verbosity_level
     
     verbosity_levels = {
-        'mute': VERBOSITY_MUTE, 
         'quiet': VERBOSITY_QUIET, 
+        'error': VERBOSITY_ERROR, 
+        'warning': VERBOSITY_WARNING, 
         'default': VERBOSITY_DEFAULT, 
         'verbose': VERBOSITY_VERBOSE, 
         'debug': VERBOSITY_DEBUG}
