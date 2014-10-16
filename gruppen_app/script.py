@@ -35,6 +35,14 @@ VERBOSITY_DEFAULT = 3
 VERBOSITY_VERBOSE = 4
 VERBOSITY_DEBUG = 5
 
+verbosity_levels = {
+    'quiet': VERBOSITY_QUIET, 
+    'error': VERBOSITY_ERROR, 
+    'warning': VERBOSITY_WARNING, 
+    'default': VERBOSITY_DEFAULT, 
+    'verbose': VERBOSITY_VERBOSE, 
+    'debug': VERBOSITY_DEBUG}
+
 # Verbosity level of the script
 verbosity_level = VERBOSITY_DEFAULT
 
@@ -44,13 +52,6 @@ verbosity_level = VERBOSITY_DEFAULT
 def set_verbosity(argument):
     global verbosity_level
     
-    verbosity_levels = {
-        'quiet': VERBOSITY_QUIET, 
-        'error': VERBOSITY_ERROR, 
-        'warning': VERBOSITY_WARNING, 
-        'default': VERBOSITY_DEFAULT, 
-        'verbose': VERBOSITY_VERBOSE, 
-        'debug': VERBOSITY_DEBUG}
     verbosity_level = verbosity_levels[argument]
 
 
