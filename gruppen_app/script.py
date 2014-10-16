@@ -27,14 +27,19 @@ Global variables and status information for the Python script.
 Parallel to the app module which (differently) contains PyQt.QApplication() specific data.
 """
 
+# Verbosity level constants
 VERBOSITY_MUTE = 0
 VERBOSITY_QUIET = 1
 VERBOSITY_DEFAULT = 2
 VERBOSITY_VERBOSE = 3
 VERBOSITY_DEBUG = 4
 
+# Verbosity level of the script
 verbosity_level = VERBOSITY_DEFAULT
 
+# Match verbosity level from the command line argument
+# (no error checking necessary as they are already
+#  checked from the argparse library)
 def set_verbosity(argument):
     global verbosity_level
     
