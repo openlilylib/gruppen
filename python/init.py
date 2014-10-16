@@ -32,7 +32,7 @@ from __future__ import unicode_literals
 import sys
 import os
 import argparse
-
+import atexit
 
 # append the _app path to Python's search path 
 # so standalone scripts have direct access to the app's modules.
@@ -59,3 +59,12 @@ info.scriptname = os.path.splitext(os.path.split(sys.argv[0])[1])[0]
 
 # initialize command line parsing
 import commandline
+
+
+# Finishing of the script
+import script
+def exit_handler():
+    script.proj.write_properties_to_json()
+
+atexit.register(exit_handler)
+    

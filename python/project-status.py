@@ -63,7 +63,6 @@ def main():
         proj.status.prune_out_dir()
         
 
-
 # ####################################
 # Finally launch the program
 if __name__ == "__main__":
