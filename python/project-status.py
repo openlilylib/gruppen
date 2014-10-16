@@ -35,31 +35,32 @@ import os
 import init
 import commandline
 import project
+import script
+from report import *
 
 def main():
-    global project
+    
+    info('Gruppen - project-status\n')
+    info('Generate status information about a Crowd-Editing project')
+    
     commandline.parser.add_argument(
         '--prune-directory', 
         action = 'store_true', 
         help=("Remove JSON/HTML files from the same day, " +
               "so there is at most one file per day."))
     args = commandline.parse()
-    # try to open a project
-    try:
-        project = project.Project(args)
-    except AssertionError, e:
-        print '\n', e, '\n'
-        sys.exit(1)
+        
+    proj = script.open_project(args)
     
     # add all present voices
-    project.read_voices()
+    proj.read_voices()
     
     # generate JSON data
-    project.status.write_json()
+    proj.status.write_json()
     
     # optionally prune output directory
     if args['prune_directory']:
-        project.status.prune_out_dir()
+        proj.status.prune_out_dir()
         
 
 

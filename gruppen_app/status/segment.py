@@ -30,6 +30,8 @@ import os
 import re
 import codecs
 
+from report import *
+
 class Segment(object):
     
     def __init__(self, voice_row, segment_name):
@@ -51,6 +53,11 @@ class Segment(object):
             self.meta_fields = {}
             self.read_file()
             self.parse_file()
+        
+        del_str = '(deleted) ' if self.deleted else ''
+        debug('Added {d} segment from {f}'.format(
+                    d = del_str, 
+                    f = self.filename))
 
     def comma_list(self, input):
         """return a cleaned list of comma-separated entries"""
@@ -75,7 +82,7 @@ class Segment(object):
             result['entry-date'] = self.meta_fields['entry-date']
             result['prooferad-by'] = self.meta_fields['proofread-by']
             result['proof-date'] = self.meta_fields['proof-date']
-            
+        
         return result
         
     def parse_file(self):

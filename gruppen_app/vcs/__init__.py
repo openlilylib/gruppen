@@ -31,6 +31,8 @@ complemented with other implementations.
 import os
 from abc import ABCMeta, abstractmethod
 
+from report import *
+
 class VCSError(OSError):
     pass
 
@@ -100,6 +102,8 @@ class VCSRepo(object):
     def deletions(self):
         """Return a dictionary of all files
         together with their deleters."""
+        
+        chat('Parse project for deleted files')
         
         # definition in subclasses!
         start_dir = self.project.rel_path('music') + '/'

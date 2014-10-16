@@ -25,9 +25,9 @@
 import os
 import subprocess
 
-import __main__
 import vcs
-
+import script
+from report import *
 
 class GitError(vcs.VCSError):
     pass
@@ -57,6 +57,9 @@ class GitRepo(vcs.VCSRepo):
             cmd.append(args)
         else:
             cmd.extend(args)
+        
+        chat('Executing Git command: {}'.format(' '.join(cmd)))
+        
         pr = subprocess.Popen(' '.join(cmd), cwd = self.root, 
                               shell = True, 
                               stdout = subprocess.PIPE, 
@@ -115,7 +118,7 @@ class GitRepo(vcs.VCSRepo):
         - files deleted by the commit
         - trailing empty line
         per commit."""
-        if not os.path.isdir(os.path.join(__main__.project['paths']['root'], start_dir)):
+        if not os.path.isdir(os.path.join(script.proj['paths']['root'], start_dir)):
             raise vcs.VCSError("Starting directory for determining deleted files\n" +
                            "doesn't exist: {}".format(start_dir))
         return self._run_command('log  --diff-filter=DR --pretty=format:\'%an\' --name-only {start}'.format(start = start_dir))
