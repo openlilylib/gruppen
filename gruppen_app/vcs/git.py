@@ -70,6 +70,7 @@ class GitRepo(vcs.VCSRepo):
         result = out.decode('utf8').split('\n')
         if result[-1] == '':
             result.pop()
+        chat(result)
         return result
         
     def branches(self, local=True):
