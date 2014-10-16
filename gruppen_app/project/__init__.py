@@ -65,7 +65,7 @@ class Project(object):
                 self['paths']['root'] = directory
             except Exception as e:
                 warn("{}\n" +
-                       "Setting project structure to default values.").format(e)
+                       "Setting project structure to default values.".format(e))
                 self.set_defaults()
         else:
             self.set_defaults()
