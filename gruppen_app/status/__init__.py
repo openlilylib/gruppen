@@ -30,6 +30,7 @@ import datetime
 import os
 
 import segmentgrid
+import script
 from report import *
 
 # define empty dicts as globally available templates
@@ -107,6 +108,8 @@ class Status(object):
         """Write status to JSON file."""
         if not out_dir:
             out_dir = self.project.abs_path('status_output')
+        if script.target_directory:
+            out_dir = script.target_directory
         if not os.path.isdir(out_dir):
             os.mkdir(out_dir)
         self._json_filename = os.path.join(out_dir, self.time_stamp() + '.json')
