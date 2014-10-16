@@ -90,4 +90,7 @@ def parse():
     
     script.set_verbosity(args['verbosity'])   
     
+    # set external target directory if passed
+    script.target_directory = args['target_directory'] if args['target_directory'] else ''
+    
     return args
