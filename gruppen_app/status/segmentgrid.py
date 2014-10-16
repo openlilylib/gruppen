@@ -163,9 +163,9 @@ class SegmentGrid(object):
         info('Generate JSON data for SegmentGrid()')
         
         result = {'metadata': self.metadata(), 
-                  'data': {}}
-        for v in self._voices:
-            result['data'][v] = self._voices[v].to_json()
+                  'data': []}
+        for v in self.project['voice_names']:
+            result['data'].append(self._voices[v].to_json())
         if indent_level < 0:
             indent_level = None
         return json.dumps(pretty_floats(result), sort_keys = True, indent = indent_level)

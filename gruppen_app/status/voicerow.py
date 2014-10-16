@@ -101,6 +101,7 @@ class VoiceRow(object):
         chat('Generate JSON for voice {}'.format(self.voice_name))
         
         result = {
+            'name': self.voice_name, 
             'completion': self.completion(), 
             'segments': {}}
         for seg in self._segments:
