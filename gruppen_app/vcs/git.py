@@ -92,16 +92,22 @@ class GitRepo(vcs.VCSRepo):
         return [line.strip() for line in self._run_command('branch', args)]
 
     def changed_files(self, other_branch, start_dir = ''):
-        """Return a list of files changed on a given branch.
+        """Return a list of modified files on a given branch.
+        Each entry is given as a tuple of relative filename and operation (A/D/M).
         Relies on finding the common ancestor between the current HEAD and
         the other branch. This *may* return too few results when the current
         branch has been merged into the other branch in the meantime
         (usually merge of master into a working branch)."""
         merge_base = ''.join(self._run_command('merge-base HEAD {}'.format(other_branch)))
-        return self._run_command('diff --name-only {m} {o} {d}'.format(
+        raw = self._run_command('diff --name-status {m} {o} {d}'.format(
                                 m = merge_base, 
                                 o = other_branch, 
                                 d = start_dir))
+        result = []
+        for line in raw:
+            result.append((line[1:].lstrip(), line[0]))
+            print result[-1]
+        return result
         
     def changed_segments(self, other_branch):
         """Return a list of changed segments in another branch.
@@ -109,11 +115,11 @@ class GitRepo(vcs.VCSRepo):
         Each segment is returned as a tuple (voice, segment)"""
         segments = self.changed_files(other_branch, self.project['paths']['music'])
         result = {}
-        for s in segments:
-            path, file = os.path.split(s[len(self.project['paths']['music'])+1:])
-            if not path in result:
-                result[path] = []
-            result[path].append(os.path.splitext(file)[0])
+        for s, m in segments:
+            voice, seg_file = os.path.split(s[len(self.project['paths']['music'])+1:])
+            if not voice in result:
+                result[voice] = []
+            result[voice].append(os.path.splitext(seg_file)[0])
             
         return result
         
