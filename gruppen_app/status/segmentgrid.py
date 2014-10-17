@@ -139,8 +139,15 @@ class SegmentGrid(object):
         info('Parse ready-for-review branches')
         for b in self.vcs.review_branches():
             chat("review branch {}".format(b))
-            self._review_branches.append(self._review_branch(b))
-        
+            rb = self._review_branch(b)
+            self._review_branches.append(rb)
+            # Update segment objects with review status
+            for voice in rb['segments']:
+                for s in rb['segments'][voice]:
+                    seg = self[voice][s]
+                    chat("Segment " + voice + ' ' + seg.name)
+                    seg.meta_fields['review-branch'] = rb['name']
+
         return self._review_branches
     
     def segment_completion(self, segment_name):
