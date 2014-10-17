@@ -44,13 +44,17 @@ class GitRepo(vcs.VCSRepo):
             raise vcs.VCSError("Git is not installed")
         
     
-    def _run_command(self, cmd, args = []): 
+    def _run_command(self, cmd, args = [], raise_error = True): 
         """
         run a git command and return its output
         as a string list.
-        Raise an exception if it returns an error.
         - cmd is the git command (without 'git')
-        - args is a string or a list of strings
+        - args is a string or a list of strings.
+        When raise_error == True any output on the error stream
+        will raise a GitError exception, otherwise it will be
+        output as part of the result string list. (This is necessary
+        because Git sometimes returns something on error that is not
+        an exception but expected behaviour.)
         """
         cmd = ['git', cmd]
         if isinstance(args, str) or isinstance(args, unicode):
@@ -66,7 +70,10 @@ class GitRepo(vcs.VCSRepo):
                               stderr = subprocess.PIPE)
         (out, error) = pr.communicate()
         if error:
-            raise GitError(str(error))
+            if raise_error:
+                raise GitError(str(error))
+            else:
+                out.extend(error)
         result = out.decode('utf8').split('\n')
         if result[-1] == '':
             result.pop()
