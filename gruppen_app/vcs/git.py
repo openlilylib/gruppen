@@ -152,6 +152,10 @@ class GitRepo(vcs.VCSRepo):
         cmd = 'pull {}'.format(remote)
         return self._run_command(cmd)
         
+    def review_branches(self):
+        """Return a list with all (remote) branches ready for review."""
+        return [branch[branch.find('origin'):] for branch in self._run_command('branch -a | grep origin/review')]
+        
     def stash(self):
         """Save the working tree to a stash.
         Return True if actually something has been stashed.
