@@ -146,8 +146,14 @@ class SegmentGrid(object):
                 for s in rb['segments'][voice]:
                     seg = self[voice][s]
                     chat("Segment " + voice + ' ' + seg.name)
-                    seg.meta_fields['review-branch'] = rb['name']
-
+                    try:
+                        seg.meta_fields['review-branch'] = rb['name']
+                    except:
+                        #TODO: This is only a workaround for a bug:
+                        # when a file has been *added* in the review branch
+                        # it is initialized as 'deleted' and we can't update it this way.
+                        pass
+                        
         return self._review_branches
     
     def segment_completion(self, segment_name):
