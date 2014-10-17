@@ -50,6 +50,7 @@ class SegmentGrid(object):
         self._completion = {}
         self._segments_completion = {}
         self._deletions = None
+        self._review_branches = []
         self.modified = False
         
 
@@ -114,13 +115,34 @@ class SegmentGrid(object):
             'voiceCount': self.voice_count(), 
             'completion': self.completion(), 
             'branch': self.vcs.current_branch(), 
+            'reviewBranches': self.review_branches(), 
             'currentCommit': self.vcs.last_commit(), 
             'totalCommits': self.vcs.total_commits(), 
             'contributors': self.vcs.contributors(), 
             'segmentsInfo': self.segments_info()
             }
 
+    def _review_branch(self, branch_name):
+        """Return a dictionary for the given review branch.
+        Update affected segments' status."""
+        result = {'name': branch_name[len('origin/review/'):], 
+                  'segments': self.vcs.changed_segments(branch_name)}
+        return result
         
+    def review_branches(self):
+        """Return a list containing ready-for-review branches.
+        If that hasn't been generated it will be done for the
+        first time, and all affected segments will be updated."""
+        if self._review_branches:
+            return self._review_branches
+        
+        info('Parse ready-for-review branches')
+        for b in self.vcs.review_branches():
+            chat("review branch {}".format(b))
+            self._review_branches.append(self._review_branch(b))
+        
+        return self._review_branches
+    
     def segment_completion(self, segment_name):
         """Return completion data for a vertical segment"""
         
