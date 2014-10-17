@@ -131,6 +131,11 @@ class GitRepo(vcs.VCSRepo):
                            "doesn't exist: {}".format(start_dir))
         return self._run_command('log  --diff-filter=DR --pretty=format:\'%an\' --name-only {start}'.format(start = start_dir))
 
+    def exec_(self, cmd, args = [], raise_error = True):
+        """Execute arbitrary Git commands,
+        public interface to _run_command()"""
+        return self._run_command(cmd, args, raise_error)
+        
     def is_clean(self):
         """Return True if the repository is clean"""
         if self._run_command('status --porcelain'):
