@@ -78,13 +78,14 @@ class Segment(object):
         result = {'status': self.status()}
         if self.deleted:
             result['deleted-by'] = self.deleted_by()
-        elif self.status() == 'ready-for-review':
-            result['review-branch'] = self.meta_fields['review-branch']
-        elif self.status() != 'not-done':
+            return result
+        if self.status() != 'not-done':
             result['entered-by'] = self.meta_fields['entered-by']
             result['entry-date'] = self.meta_fields['entry-date']
-            result['prooferad-by'] = self.meta_fields['proofread-by']
+            result['proofread-by'] = self.meta_fields['proofread-by']
             result['proof-date'] = self.meta_fields['proof-date']
+        if self.status() == 'ready-for-review':
+            result['review-branch'] = self.meta_fields['review-branch']
         
         return result
         
