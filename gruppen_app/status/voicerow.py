@@ -48,7 +48,7 @@ class VoiceRow(object):
         self._dir = os.path.join(self.project['paths']['music'], voice_name)
         
         for seg in self.segment_names():
-            self._segments[seg] = self.read_segment(seg)
+            self._segments[seg] = segment.Segment(self, seg)
     
     def __getitem__(self, segment_name):
         """Return a segment object as if we were a dictionary."""
@@ -108,10 +108,6 @@ class VoiceRow(object):
             if self._segments[seg].status() != 'not-done':
                 result['segments'][seg] = self._segments[seg].to_json()
         return result
-
-    def read_segment(self, segment_name):
-        """Return a new Segment object"""
-        return segment.Segment(self, segment_name)
 
     def segment_names(self):
         """Return the project's list of segment_names"""
