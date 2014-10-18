@@ -121,15 +121,14 @@ class Segment(object):
         """Return the status property of the segment."""
         if self.deleted:
             return "deleted"
+        if 'review-branch' in self.meta_fields:
+            return "ready-for-review"
         if self.meta_fields['entered-by'][0]:
             if self.meta_fields['proofread-by'][0]:
                 return "reviewed"
             else:
                 return "entered"
-        if 'review-branch' in self.meta_fields:
-            return "ready-for-review"
-        else:
-            return "not-done"
+        return "not-done"
     
 
 
