@@ -48,7 +48,7 @@ class VoiceRow(object):
         self._dir = os.path.join(self.project['paths']['music'], voice_name)
         
         for seg in self.segment_names():
-            self._segments[seg] = self.read_segment(seg)
+            self._segments[seg] = segment.Segment(self, seg)
     
     def __getitem__(self, segment_name):
         """Return a segment object as if we were a dictionary."""
@@ -60,18 +60,19 @@ class VoiceRow(object):
         
         debug('Calculate statistics for {}'.format(self.voice_name))
         
-        for s in status.segment_states:
-            states[s] = 0
-            
-        for seg in self._segments:
-            states[self._segments[seg].status()] += 1
         self._completion_data = cd = status.completion_entries.copy()
+
+        # initialize completion fields
+        for s in status.segment_states:
+            cd[s] = 0
+        
+        # iterate over segments and sum the status fields
+        for seg in self._segments:
+            cd[self._segments[seg].status()] += 1
+
+        # calculate remaining values
         cd['total'] = self.project.segment_count()
-        cd['valid'] = cd['total'] - states['deleted']
-        cd['entered'] = states['entered']
-        cd['reviewed'] = states['reviewed']
-        cd['deleted'] = states['deleted']
-        cd['not-done'] = states['not-done']
+        cd['valid'] = cd['total'] - cd['deleted']
         cd['completion'] = cd['reviewed'] / cd['valid'] * 100 if cd['valid'] > 0 else 100
         
     def completion(self):
@@ -108,10 +109,6 @@ class VoiceRow(object):
             if self._segments[seg].status() != 'not-done':
                 result['segments'][seg] = self._segments[seg].to_json()
         return result
-
-    def read_segment(self, segment_name):
-        """Return a new Segment object"""
-        return segment.Segment(self, segment_name)
 
     def segment_names(self):
         """Return the project's list of segment_names"""

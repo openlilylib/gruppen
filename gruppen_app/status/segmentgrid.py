@@ -28,11 +28,13 @@ Segment grid representing the progress states of all segments
 
 from __future__ import division
 
+import os, sys
 from collections import Counter
 import datetime
 import json
 
 import voicerow
+from segment import parse_segment_meta_fields
 import status
 from report import *
 from script import pretty_floats
@@ -49,7 +51,8 @@ class SegmentGrid(object):
         self._voices = {}
         self._completion = {}
         self._segments_completion = {}
-        self._deletions = None
+        self._deletions = {}
+        self._review_branches = []
         self.modified = False
         
 
@@ -95,31 +98,112 @@ class SegmentGrid(object):
         self._completion['completion'] = self._completion['reviewed'] / self._completion['valid'] * 100
         return self._completion
 
+    def _generate_deletions(self):
+        """Generate deletion data, ensuring that
+        voices without deleted files get at least empty entries."""
+        self._deletions = self.vcs.deletions()
+        for v in self.voice_names():
+            if not v in self._deletions:
+                self._deletions[v] = {}
+                debug("emtpy voice {} added.".format(v))
+        debug(json.dumps(self._deletions, sort_keys = True, indent = 2))
+
     def deleted_by(self, voice, segment):
         """Return the name of the contributor who has deleted the given file.
         Returns an empty string if the file hasn't been deleted or noone can
         be reliably determined."""
         if not self._deletions:
-            self._deletions = self.vcs.deletions()
-            # add empty records for voices without deleted files
-            for v in self.voice_names():
-                if not v in self._deletions:
-                    self._deletions[v] = {}
-            debug(json.dumps(self._deletions, sort_keys = True, indent = 2))
+            self._generate_deletions()
         return self._deletions[voice][segment]
+        
+    def deletions(self):
+        if not self._deletions:
+            self._generate_deletions()
+        return self._deletions
+        
+    def invalidate_completion_data(self):
+        """Delete all completion data to force
+        their regeneration for next access."""
+        self._completion = {}
+        self._segments_completion = {}
+        for v in self._voices:
+            self._voices[v]._completion_data = {}
         
     def metadata(self):
         return {
             'dateTime': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), 
             'voiceCount': self.voice_count(), 
-            'completion': self.completion(), 
             'branch': self.vcs.current_branch(), 
+            'reviewBranches': self.review_branches(), 
             'currentCommit': self.vcs.last_commit(), 
             'totalCommits': self.vcs.total_commits(), 
             'contributors': self.vcs.contributors(), 
-            'segmentsInfo': self.segments_info()
+            'segmentsInfo': self.segments_info(), 
+            'completion': self.completion() 
             }
 
+    def _review_branch(self, branch_name):
+        """Return a dictionary for the given review branch.
+        Update affected segments' status."""
+        result = {'name': branch_name[len('origin/review/'):], 
+                  'segments': self.vcs.changed_segments(branch_name)}
+        return result
+        
+    def review_branches(self):
+        """Return a list containing ready-for-review branches.
+        If that hasn't been generated it will be done for the
+        first time, and all affected segments will be updated."""
+        if self._review_branches:
+            return self._review_branches
+        
+        info('Parse ready-for-review branches')
+        for review_branch in self.vcs.review_branches():
+            chat("review branch {}".format(review_branch))
+            
+            # create new review-branch entry for metadata
+            rb = {'name': review_branch[len('origin/review')+1:], 
+                  'segments': []}
+
+            # Get relevant base data from Git to parse non-checked-out branch information
+            merge_base = ''.join(self.vcs._run_command('merge-base HEAD {}'.format(review_branch)))
+            affected_files = self.vcs.exec_('diff --name-status {m} {o} {d}'.format(
+                                        m = merge_base, 
+                                        o = review_branch, 
+                                        d = self.project['paths']['music']))
+            
+            for line in affected_files:
+                # parse line
+                operation = line[0]
+                file_name = line[1:].lstrip()
+                voice, seg_file = os.path.split(file_name[len(self.project['paths']['music'])+1:])
+                seg_name = os.path.splitext(seg_file)[0]
+                
+                # get Segment object
+                seg_obj = self[voice][seg_name]
+                
+                # handle files that are deleted on the review branch
+                if operation == 'D':
+                    seg_obj.deleted = True
+                    seg_obj.meta_fields = {'deleted-by': rb['name']}
+                    self.deletions()[voice][seg_name] = rb['name']
+                else:
+                    # get file content from the review branch
+                    content = self.vcs.exec_('show {b}:{f}'.format(
+                                             b = review_branch, 
+                                             f = file_name))
+                    # parse content from the review branch and apply to segment object
+                    seg_obj.meta_fields = parse_segment_meta_fields(content)
+                    
+                # mark segment as ready-for-review
+                seg_obj.meta_fields['review-branch'] = rb['name']
+                
+                # add segment to branch's list of affected segments
+                rb['segments'].append((voice, seg_name))
+            
+            # finally append the generated dict to the output list
+            self._review_branches.append(rb)
+        
+        return self._review_branches
         
     def segment_completion(self, segment_name):
         """Return completion data for a vertical segment"""

@@ -38,6 +38,7 @@ completion_entries = {
         'total': 0, 
         'valid': 0, 
         'entered': 0, 
+        'ready-for-review': 0, 
         'reviewed': 0, 
         'deleted': 0, 
         'not-done': 0, 
@@ -46,6 +47,7 @@ completion_entries = {
         
 segment_states = [
         'entered', 
+        'ready-for-review', 
         'reviewed', 
         'deleted', 
         'not-done', 
