@@ -60,19 +60,19 @@ class VoiceRow(object):
         
         debug('Calculate statistics for {}'.format(self.voice_name))
         
-        for s in status.segment_states:
-            states[s] = 0
-            
-        for seg in self._segments:
-            states[self._segments[seg].status()] += 1
         self._completion_data = cd = status.completion_entries.copy()
+
+        # initialize completion fields
+        for s in status.segment_states:
+            cd[s] = 0
+        
+        # iterate over segments and sum the status fields
+        for seg in self._segments:
+            cd[self._segments[seg].status()] += 1
+
+        # calculate remaining values
         cd['total'] = self.project.segment_count()
-        cd['valid'] = cd['total'] - states['deleted']
-        cd['entered'] = states['entered']
-        cd['ready-for-review'] = states['ready-for-review']
-        cd['reviewed'] = states['reviewed']
-        cd['deleted'] = states['deleted']
-        cd['not-done'] = states['not-done']
+        cd['valid'] = cd['total'] - cd['deleted']
         cd['completion'] = cd['reviewed'] / cd['valid'] * 100 if cd['valid'] > 0 else 100
         
     def completion(self):
