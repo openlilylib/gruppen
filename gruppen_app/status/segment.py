@@ -32,6 +32,21 @@ import codecs
 
 from report import *
 
+def comma_list(input):
+    """return a cleaned list of comma-separated entries"""
+    return [entry.strip() for entry in input.split(',')]
+    
+def parse_segment_meta_fields(content):
+    """Read the metadata fields from the
+    header comment section of a segment.
+    Return a dictionary with four values."""
+    result = {}
+    for line in content:
+        m = re.search('(@entered-by|@entry-date|@proofread-by|@proof-date).*:', line)
+        if m:
+            result[m.group(1)[1:]] = comma_list(line[m.end():].lstrip())
+    return result
+    
 class Segment(object):
     
     def __init__(self, voice_row, segment_name):
@@ -60,10 +75,6 @@ class Segment(object):
                     d = del_str, 
                     f = self.filename))
 
-    def comma_list(self, input):
-        """return a cleaned list of comma-separated entries"""
-        return [entry.strip() for entry in input.split(',')]
-    
     def deleted_by(self):
         """Return the name of the deleter of the segment file
         or an empty string if it is not deleted."""
@@ -96,10 +107,7 @@ class Segment(object):
     def parse_meta_fields(self):
         """Read the metadata fields from the
         header comment section."""
-        for line in self.file_content:
-            m = re.search('(@entered-by|@entry-date|@proofread-by|@proof-date).*:', line)
-            if m:
-                self.meta_fields[m.group(1)[1:]] = self.comma_list(line[m.end()+1:])
+        self.meta_fields = parse_segment_meta_fields(self.file_content)
         
     def read_file(self):
         """Load the segment from file"""
