@@ -69,6 +69,7 @@ class VoiceRow(object):
         cd['total'] = self.project.segment_count()
         cd['valid'] = cd['total'] - states['deleted']
         cd['entered'] = states['entered']
+        cd['ready-for-review'] = states['ready-for-review']
         cd['reviewed'] = states['reviewed']
         cd['deleted'] = states['deleted']
         cd['not-done'] = states['not-done']
