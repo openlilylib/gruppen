@@ -28,6 +28,7 @@ Segment grid representing the progress states of all segments
 
 from __future__ import division
 
+import os
 from collections import Counter
 import datetime
 import json
@@ -96,18 +97,30 @@ class SegmentGrid(object):
         self._completion['completion'] = self._completion['reviewed'] / self._completion['valid'] * 100
         return self._completion
 
+    def _generate_deletions(self):
+        """Generate deletion data, ensuring that
+        voices without deleted files get at least empty entries."""
+        self._deletions = self.vcs.deletions()
+        for v in self.voice_names():
+            if not v in self._deletions:
+                self._deletions[v] = {}
+        debug(json.dumps(self._deletions, sort_keys = True, indent = 2))
+
     def deleted_by(self, voice, segment):
         """Return the name of the contributor who has deleted the given file.
         Returns an empty string if the file hasn't been deleted or noone can
         be reliably determined."""
         if not self._deletions:
-            self._deletions = self.vcs.deletions()
-            # add empty records for voices without deleted files
-            for v in self.voice_names():
-                if not v in self._deletions:
-                    self._deletions[v] = {}
-            debug(json.dumps(self._deletions, sort_keys = True, indent = 2))
+            self._generate_deletions()
         return self._deletions[voice][segment]
+        
+    def invalidate_completion_data(self):
+        """Delete all completion data to force
+        their regeneration for next access."""
+        self._completion = {}
+        self._segments_completion = {}
+        for v in self._voices:
+            self._voices[v]._completion_data = {}
         
     def metadata(self):
         return {
