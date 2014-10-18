@@ -28,12 +28,13 @@ Segment grid representing the progress states of all segments
 
 from __future__ import division
 
-import os
+import os, sys
 from collections import Counter
 import datetime
 import json
 
 import voicerow
+from segment import parse_segment_meta_fields
 import status
 from report import *
 from script import pretty_floats
@@ -50,7 +51,7 @@ class SegmentGrid(object):
         self._voices = {}
         self._completion = {}
         self._segments_completion = {}
-        self._deletions = None
+        self._deletions = {}
         self._review_branches = []
         self.modified = False
         
@@ -104,6 +105,7 @@ class SegmentGrid(object):
         for v in self.voice_names():
             if not v in self._deletions:
                 self._deletions[v] = {}
+                debug("emtpy voice {} added.".format(v))
         debug(json.dumps(self._deletions, sort_keys = True, indent = 2))
 
     def deleted_by(self, voice, segment):
@@ -113,6 +115,11 @@ class SegmentGrid(object):
         if not self._deletions:
             self._generate_deletions()
         return self._deletions[voice][segment]
+        
+    def deletions(self):
+        if not self._deletions:
+            self._generate_deletions()
+        return self._deletions
         
     def invalidate_completion_data(self):
         """Delete all completion data to force
@@ -126,13 +133,13 @@ class SegmentGrid(object):
         return {
             'dateTime': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), 
             'voiceCount': self.voice_count(), 
-            'completion': self.completion(), 
             'branch': self.vcs.current_branch(), 
             'reviewBranches': self.review_branches(), 
             'currentCommit': self.vcs.last_commit(), 
             'totalCommits': self.vcs.total_commits(), 
             'contributors': self.vcs.contributors(), 
-            'segmentsInfo': self.segments_info()
+            'segmentsInfo': self.segments_info(), 
+            'completion': self.completion() 
             }
 
     def _review_branch(self, branch_name):
@@ -150,77 +157,54 @@ class SegmentGrid(object):
             return self._review_branches
         
         info('Parse ready-for-review branches')
-        for rb in self.vcs.review_branches():
-            chat("review branch {}".format(rb))
+        for review_branch in self.vcs.review_branches():
+            chat("review branch {}".format(review_branch))
             
+            # create new review-branch entry for metadata
+            rb = {'name': review_branch[len('origin/review')+1:], 
+                  'segments': []}
 
             # Get relevant base data from Git to parse non-checked-out branch information
-            merge_base = ''.join(self.vcs._run_command('merge-base HEAD {}'.format(rb)))
-            diff = self.vcs.exec_('diff {m} {o} {d} | grep \"@entered-by\\|+++\\|---\"'.format(
+            merge_base = ''.join(self.vcs._run_command('merge-base HEAD {}'.format(review_branch)))
+            affected_files = self.vcs.exec_('diff --name-status {m} {o} {d}'.format(
                                         m = merge_base, 
-                                        o = rb, 
+                                        o = review_branch, 
                                         d = self.project['paths']['music']))
-            # collect information on the changed segments
-            changed_segments = cs = []
-            for line in diff:
-                if line.startswith('---'):
-                    cs.append({'our-file': line.lstrip(' -')})
-                if line.startswith('+++'):
-                    cs[-1]['their-file'] = line.lstrip(' +')
-                if line.startswith('- '):
-                    cs[-1]['our-entered'] = line[line.find(':')+1:].lstrip()
-                if line.startswith('+ '):
-                    cs[-1]['their-entered'] = line[line.find(':')+1:].lstrip()
             
-            # process all segments from the current branch
-            for seg in cs:
-                segment_added = False
-                segment_deleted = False
-                segment_modified = False
-                if seg['our-file'] == '/dev/null':
-                    segment_added = True
-                    file = seg['their-file'][2:]
-                elif seg['their-file'] == '/dev/null':
-                    segment_deleted = True
-                    file = seg['our-file'][2:]
-                else:
-                    segment_modified = True
-                    file = seg['our-file'][2:]
-                # strip leading path
-                file = file[len(self.project['paths']['music'])+1:]
-                voice, seg_file = os.path.split(file)
+            for line in affected_files:
+                # parse line
+                operation = line[0]
+                file_name = line[1:].lstrip()
+                voice, seg_file = os.path.split(file_name[len(self.project['paths']['music'])+1:])
                 seg_name = os.path.splitext(seg_file)[0]
-                # get Segment object
-                segment = self[voice][seg_name]
                 
-                # update Segment object
-                if segment_added:
-                    segment.meta_fields = {'entered-by': seg['their-entered']}
-                elif segment_deleted:
-                    segment.deleted = True
-                    segment.meta_fields['deleted-by'] = 'branch {}'.format(rb)
+                # get Segment object
+                seg_obj = self[voice][seg_name]
+                
+                # handle files that are deleted on the review branch
+                if operation == 'D':
+                    seg_obj.deleted = True
+                    seg_obj.meta_fields = {'deleted-by': rb['name']}
+                    self.deletions()[voice][seg_name] = rb['name']
                 else:
-                    segment.meta_fields['entered-by'] = seg['their-entered']
-                segment.meta_fields['review-branch'] = rb
+                    # get file content from the review branch
+                    content = self.vcs.exec_('show {b}:{f}'.format(
+                                             b = review_branch, 
+                                             f = file_name))
+                    # parse content from the review branch and apply to segment object
+                    seg_obj.meta_fields = parse_segment_meta_fields(content)
+                    
+                # mark segment as ready-for-review
+                seg_obj.meta_fields['review-branch'] = rb['name']
+                
+                # add segment to branch's list of affected segments
+                rb['segments'].append((voice, seg_name))
             
-            
-#            rb = self._review_branch(b)
-#            self._review_branches.append(rb)
-#            # Update segment objects with review status
-#            for voice in rb['segments']:
-#                for s in rb['segments'][voice]:
-#                    seg = self[voice][s]
-#                    chat("Segment " + voice + ' ' + seg.name)
-#                    try:
-#                        seg.meta_fields['review-branch'] = rb['name']
-#                    except:
-                        #TODO: This is only a workaround for a bug:
-                        # when a file has been *added* in the review branch
-                        # it is initialized as 'deleted' and we can't update it this way.
-#                        pass
-                        
+            # finally append the generated dict to the output list
+            self._review_branches.append(rb)
+        
         return self._review_branches
-    
+        
     def segment_completion(self, segment_name):
         """Return completion data for a vertical segment"""
         
