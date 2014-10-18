@@ -137,22 +137,74 @@ class SegmentGrid(object):
             return self._review_branches
         
         info('Parse ready-for-review branches')
-        for b in self.vcs.review_branches():
-            chat("review branch {}".format(b))
-            rb = self._review_branch(b)
-            self._review_branches.append(rb)
-            # Update segment objects with review status
-            for voice in rb['segments']:
-                for s in rb['segments'][voice]:
-                    seg = self[voice][s]
-                    chat("Segment " + voice + ' ' + seg.name)
-                    try:
-                        seg.meta_fields['review-branch'] = rb['name']
-                    except:
+        for rb in self.vcs.review_branches():
+            chat("review branch {}".format(rb))
+            
+
+            # Get relevant base data from Git to parse non-checked-out branch information
+            merge_base = ''.join(self.vcs._run_command('merge-base HEAD {}'.format(rb)))
+            diff = self.vcs.exec_('diff {m} {o} {d} | grep \"@entered-by\\|+++\\|---\"'.format(
+                                        m = merge_base, 
+                                        o = rb, 
+                                        d = self.project['paths']['music']))
+            # collect information on the changed segments
+            changed_segments = cs = []
+            for line in diff:
+                if line.startswith('---'):
+                    cs.append({'our-file': line.lstrip(' -')})
+                if line.startswith('+++'):
+                    cs[-1]['their-file'] = line.lstrip(' +')
+                if line.startswith('- '):
+                    cs[-1]['our-entered'] = line[line.find(':')+1:].lstrip()
+                if line.startswith('+ '):
+                    cs[-1]['their-entered'] = line[line.find(':')+1:].lstrip()
+            
+            # process all segments from the current branch
+            for seg in cs:
+                segment_added = False
+                segment_deleted = False
+                segment_modified = False
+                if seg['our-file'] == '/dev/null':
+                    segment_added = True
+                    file = seg['their-file'][2:]
+                elif seg['their-file'] == '/dev/null':
+                    segment_deleted = True
+                    file = seg['our-file'][2:]
+                else:
+                    segment_modified = True
+                    file = seg['our-file'][2:]
+                # strip leading path
+                file = file[len(self.project['paths']['music'])+1:]
+                voice, seg_file = os.path.split(file)
+                seg_name = os.path.splitext(seg_file)[0]
+                # get Segment object
+                segment = self[voice][seg_name]
+                
+                # update Segment object
+                if segment_added:
+                    segment.meta_fields = {'entered-by': seg['their-entered']}
+                elif segment_deleted:
+                    segment.deleted = True
+                    segment.meta_fields['deleted-by'] = 'branch {}'.format(rb)
+                else:
+                    segment.meta_fields['entered-by'] = seg['their-entered']
+                segment.meta_fields['review-branch'] = rb
+            
+            
+#            rb = self._review_branch(b)
+#            self._review_branches.append(rb)
+#            # Update segment objects with review status
+#            for voice in rb['segments']:
+#                for s in rb['segments'][voice]:
+#                    seg = self[voice][s]
+#                    chat("Segment " + voice + ' ' + seg.name)
+#                    try:
+#                        seg.meta_fields['review-branch'] = rb['name']
+#                    except:
                         #TODO: This is only a workaround for a bug:
                         # when a file has been *added* in the review branch
                         # it is initialized as 'deleted' and we can't update it this way.
-                        pass
+#                        pass
                         
         return self._review_branches
     

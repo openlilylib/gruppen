@@ -55,7 +55,7 @@ def main():
     
     # ensure the repo is in the right state
     init.prepare_repository(proj.vcs)
- 
+    
     try:
         # add all present voices
         proj.read_voices()
