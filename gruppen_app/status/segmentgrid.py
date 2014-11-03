@@ -178,6 +178,10 @@ class SegmentGrid(object):
                 voice, seg_file = os.path.split(file_name[len(self.project['paths']['music'])+1:])
                 seg_name = os.path.splitext(seg_file)[0]
                 
+                # discard modifications to non-segment files
+                if not seg_name in self.project['segment_names']:
+                    continue
+                
                 # get Segment object
                 seg_obj = self[voice][seg_name]
                 
