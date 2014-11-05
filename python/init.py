@@ -105,8 +105,9 @@ def prepare_repository(vcs):
             vcs.checkout('master')
             vcs.pull()
         except Exception,  e:
-            error('There has been a problem preparing the repository:\n{}\n' 
+            error('There has been a problem preparing the repository:\n{}\n' +
+                  'This must be clean (empty git status).' +
                   'Please check the repository carefully!\n'.format(e))
-            finish_repository(proj.vcs)
+            finish_repository(vcs)
             sys.exit(1)
 
