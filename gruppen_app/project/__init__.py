@@ -156,6 +156,9 @@ class Project(object):
         self.properties['paths']['project_info'] = 'project'
         self.properties['paths']['music'] = 'music'
         self.properties['paths']['status_output'] = 'status'
+        self.properties['paths']['segment_templates'] = ['templates', 'segment_templates.ily']
+        self.properties['paths']['cell_template'] = ['templates', 'cell_template.ily']
+
         
         # read voice_names from actual directories
         self.init_voice_names(self._voice_names_by_dirlist)

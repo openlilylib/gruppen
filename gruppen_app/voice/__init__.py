@@ -27,6 +27,7 @@ Voice (in the sense of a voice directory)
 """
 import os, sys
 import script
+import celltemplate
 from report import *
 
 class Voice(object):
@@ -34,8 +35,35 @@ class Voice(object):
     def __init__(self, project, properties):
         self._properties = properties
         self._properties['project'] = project
+        self._root_dir = project['paths']['root']
+        self.music_dir = os.path.join(self._root_dir,
+                                      project['paths']['music'],
+                                      properties['basename'])
+
+        # Safety check - may be done smarter in the future:
+        if os.path.exists(self.music_dir):
+            error(("Target directory already exists:\n  {}\n" +
+                "I'm not smart enough yet, aborting.").format(self.music_dir))
+            sys.exit(1)
+
+        self._cell_template = celltemplate.CellTemplate(
+            os.path.join(self._root_dir, self['project']['paths']['cell_template'])
+        )
 
     def __getitem__(self, property):
         """Return project property - as if Project were a dict object"""
         return self._properties[property]
 
+
+    def load_segment_template(self):
+        """Load the template for segments
+        from a template file."""
+        try:
+            result = ''
+            f = open(os.path.join(self._root_dir, self['project']['paths']['cell_template']))
+            seg_template = f.readlines()
+            f.close()
+            return ''.join(seg_template)
+        except:
+            # for now simply re-throw the exception
+            raise

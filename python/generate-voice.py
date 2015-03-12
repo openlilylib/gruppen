@@ -125,7 +125,7 @@ def main():
     # create a new Voice object for the project
     new_voice = voice.Voice(proj, voice_props)
 
-    print new_voice['project']['paths']
+    print new_voice._segment_template
 
     print voice_props
     print voice_props.get('key', 'No key defined')
