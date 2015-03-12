@@ -32,6 +32,7 @@ import init
 import commandline
 import project
 import script
+import voice
 from report import *
 
 
@@ -81,7 +82,7 @@ def add_commandline_args():
 
 def get_voice_props(args):
     """
-    retrieve the properties of the new voice
+    retrieve the properties of the to-be-generated voice
     from the command line arguments.
     """
 
@@ -121,7 +122,10 @@ def main():
     # open target repository
     proj = script.open_project(args)
 
-    print proj.properties
+    # create a new Voice object for the project
+    new_voice = voice.Voice(proj, voice_props)
+
+    print new_voice['project']['paths']
 
     print voice_props
     print voice_props.get('key', 'No key defined')
