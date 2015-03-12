@@ -42,14 +42,25 @@ def main():
     
     info('Gruppen - project-status\n')
     info('Generate status information about a Crowd-Editing project')
-    
+
     commandline.parser.add_argument(
-        '--prune-directory', 
-        action = 'store_true', 
+        '-t', '--target-directory',
+        help = ("directory where the JSON/HTML file will be " +
+                "saved to (will be created if it doesn't exist). " +
+                "accepts absolute or relative paths"))
+
+    commandline.parser.add_argument(
+        '--prune-directory',
+        action = 'store_true',
         help=("Remove JSON/HTML files from the same day, " +
               "so there is at most one file per day."))
-    
+
     args = commandline.parse()
+
+    # set external target directory if passed
+    script.target_directory = args['target_directory'] if args['target_directory'] else ''
+
+
         
     proj = script.open_project(args)
     
