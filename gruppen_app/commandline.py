@@ -39,6 +39,13 @@ import script
 parser = None
 def create_parser():
     global parser
+    global required_named
+
+    # Used option short names:
+    # d l m p V
+    # implicitly:
+    # a f o p v
+
     parser = argparse.ArgumentParser(
         usage = ("{scriptname} [options]").format(scriptname = info.scriptname),
         version = "{appname} {scriptname} {version}".format(
@@ -46,7 +53,11 @@ def create_parser():
             scriptname = info.scriptname, 
             version = info.version),
         description = ("A LilyPond Project Manager"))
-    parser.add_argument('-d', '--directory', 
+
+    # Provide interface support for "required options".
+    required_named = parser.add_argument_group('Required named arguments')
+
+    parser.add_argument('-d', '--directory',
         help=("Root directory of the project, relative or absolute path, " +
               "not passing this argument means 'current directory'."))
     parser.add_argument('-p', '--properties-file', 
@@ -67,11 +78,11 @@ def create_parser():
     # Make sure debugger options are recognized as valid. These are passed automatically
     # from PyDev in Eclipse to the inferior process.
     if "pydevd" in sys.modules:
-        parser.add_option('-v', '--vm_type')
-        parser.add_option('-a', '--client')
-        parser.add_option('-p', '--port')
-        parser.add_option('-f', '--file')
-        parser.add_option('-o', '--output')
+        parser.add_argument('-v', '--vm_type')
+        parser.add_argument('-a', '--client')
+        parser.add_argument('-p', '--port')
+        parser.add_argument('-f', '--file')
+        parser.add_argument('-o', '--output')
 
 create_parser()
 
