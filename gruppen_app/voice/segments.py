@@ -39,23 +39,17 @@ class Segment(object):
     """
     def __init__(self, content):
         self._name = ''
+        self._properties = {}
         # Extract segment content and remainder from the content string list
         # the remainder is used to generate the next segment from
         self.content, self.remaining_content = self.read_content(content)
+        self.parse_content()
 
-    def _get_name(self):
-        line = self.content[0].strip()
-        name = line[:line.find(' =')]
-        self._name = name
-        return name
-
-    def music(self):
+    def __getitem__(self, property):
         """
-        Return the content of the music expression,
-        i.e. without declaration and closing line.
-        :return: string list
+        Return the requested property as if Segment were a dict
         """
-        return self.content[1:-1]
+        return self._properties[property]
 
     def roman_index(self):
         """
@@ -65,12 +59,59 @@ class Segment(object):
         """
         return -1
 
-    def name(self):
+    def parse_content(self):
         """
-        Name of the segment as per the variable name in the input file
-        :return: String
+        Parse content and retrieve properties of the music segment.
         """
-        return self._name if self._name else self._get_name()
+
+        def is_time_signature(line):
+            """
+            Returns a time signature string if the given line is a time signature
+            or an empty string if not
+            """
+            match = re.search("(\\\\time *)([0-9]+/[0-9]+)", line)
+            return match.group(2) if match else ''
+
+
+        # read segment name from first content line
+        line = self.content[0].strip()
+        self._properties['name'] = line[:line.find(' =')]
+
+        # read the body of the content, extracting and/or removing lines to properties
+        i = 1
+        music = []
+        while not i >= len(self.content) - 1:
+            line = self.content[i]
+            lstr = line.strip()
+
+            # Check for time signatures
+            time_sig = is_time_signature(lstr)
+            if time_sig:
+                # set start/end time signatures.
+                # remove content line for first
+                if not 'time_signature_start' in self._properties:
+                    self._properties['time_signature_start'] = time_sig
+                    self._properties['time_signature_end'] = time_sig
+                    i += 1
+                    continue
+                else:
+                    self._properties['time_signature_end'] = time_sig
+
+            music.append(line)
+            i += 1
+
+
+        #store the resulting music expression
+        self._properties['music'] = sm = ['{']
+        sm.extend(music)
+        sm.append('}')
+
+        print
+        print self['name']
+        print "time start:", self._properties.get('time_signature_start', 'not defined')
+        print "time end:", self._properties.get('time_signature_end', 'not defined')
+        print ''.join(self['music'])
+
 
     def read_content(self, content):
         """
@@ -166,14 +207,14 @@ class Segments(object):
     def add_segment(self, segment):
         """Add a segment to the internal list and dictionary."""
 
-        if segment.name() in self._segments_list:
-            raise Exception("Segment {} already defined".format(segment.name()))
+        if segment['name'] in self._segments_list:
+            raise Exception("Segment {} already defined".format(segment['name']))
         # we don't need to carry this along with us any further
         segment.remaining_content = []
 
         # store the segment and its name
-        self._segments_list.append(segment.name())
-        self._segments[segment.name()] = segment
+        self._segments_list.append(segment['name'])
+        self._segments[segment['name']] = segment
 
     def parse_segments(self):
         result = {}
