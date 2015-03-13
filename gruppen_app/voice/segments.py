@@ -64,6 +64,14 @@ class Segment(object):
         Parse content and retrieve properties of the music segment.
         """
 
+        def is_key_signature(line):
+            """
+            Returns a key signature string if the given line is a key signature
+            or an empty string if not
+            """
+            match = re.search("(\\\\key *)([a-z]* *(\\\\major|\\\\minor))", line)
+            return match.group(2) if match else ''
+
         def is_time_signature(line):
             """
             Returns a time signature string if the given line is a time signature
@@ -97,6 +105,18 @@ class Segment(object):
                 else:
                     self._properties['time_signature_end'] = time_sig
 
+            # Check for key signatures
+            key_sig = is_key_signature(line)
+            if key_sig:
+                if not 'key_signature_start' in self._properties:
+                    self._properties['key_signature_start'] = key_sig
+                    self._properties['key_signature_end'] = key_sig
+                    i += 1
+                    continue
+                else:
+                    self._properties['key_signature_end'] = key_sig
+
+
             music.append(line)
             i += 1
 
@@ -110,7 +130,9 @@ class Segment(object):
         print self['name']
         print "time start:", self._properties.get('time_signature_start', 'not defined')
         print "time end:", self._properties.get('time_signature_end', 'not defined')
-        print ''.join(self['music'])
+        print "key start:", self._properties.get('key_signature_start', 'not defined')
+        print "key end:", self._properties.get('key_signature_end', 'not defined')
+        #print ''.join(self['music'])
 
 
     def read_content(self, content):
