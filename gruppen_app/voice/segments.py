@@ -64,6 +64,14 @@ class Segment(object):
         Parse content and retrieve properties of the music segment.
         """
 
+        def is_barnumber_check(line):
+            """
+            Returns a bar number if the given line is a barnumber check
+            or integer zero if not
+            """
+            match = re.search("(\\\\barNumberCheck *\#)([0-9]+)", line)
+            return match.group(2) if match else 0
+
         def is_key_signature(line):
             """
             Returns a key signature string if the given line is a key signature
@@ -92,6 +100,10 @@ class Segment(object):
             line = self.content[i]
             lstr = line.strip()
 
+            # TODO: This is not really robust yet.
+            # We're only checking for the first occurrences without really testing
+            # whether there is any music *before* that.
+
             # Check for time signatures
             time_sig = is_time_signature(lstr)
             if time_sig:
@@ -116,6 +128,14 @@ class Segment(object):
                 else:
                     self._properties['key_signature_end'] = key_sig
 
+            # Check for barnumber checks
+            barnumber_check = is_barnumber_check(line)
+            if barnumber_check:
+                if not 'barnumber_start' in self._properties:
+                    self._properties['barnumber_start'] = barnumber_check
+                    i += 1
+                    continue
+
 
             music.append(line)
             i += 1
@@ -128,6 +148,7 @@ class Segment(object):
 
         print
         print self['name']
+        print "barnumber start:", self._properties.get('barnumber_start', 'not defined')
         print "time start:", self._properties.get('time_signature_start', 'not defined')
         print "time end:", self._properties.get('time_signature_end', 'not defined')
         print "key start:", self._properties.get('key_signature_start', 'not defined')
