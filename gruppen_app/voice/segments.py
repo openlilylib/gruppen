@@ -37,6 +37,25 @@ class Segment(object):
     """
     Represents one segment to be used as a grid segment template.
     """
+
+    # Empty cell template
+    _template = []
+
+    @staticmethod
+    def _load_template(filename):
+        """
+        Load the template for segments
+        from a template file and store as a static variable.
+        """
+        try:
+            f = open(filename)
+            Segment._template = f.readlines()
+            f.close()
+        except:
+            # for now simply re-throw the exception
+            raise
+
+
     def __init__(self, content):
         self.content = content
         self._properties = {}
@@ -152,6 +171,7 @@ class Segment(object):
         sm.extend(music)
         sm.append('}')
 
+
 class Segments(object):
     """
     Represents a string of segments
@@ -161,9 +181,8 @@ class Segments(object):
         self.voice = voice
 
         # Template file that will later be patched with the empty segments' contents
-        self._cell_template = celltemplate.CellTemplate(
-            os.path.join(voice._root_dir, voice['project']['paths']['cell_template'])
-        )
+        Segment._load_template(os.path.join(voice._root_dir,
+                                            voice['project']['paths']['cell_template']))
 
         self._segments_list = []
         self._segments = {}
