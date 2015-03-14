@@ -38,11 +38,8 @@ class Segment(object):
     Represents one segment to be used as a grid segment template.
     """
     def __init__(self, content):
-        self._name = ''
+        self.content = content
         self._properties = {}
-        # Extract segment content and remainder from the content string list
-        # the remainder is used to generate the next segment from
-        self.content, self.remaining_content = self.read_content(content)
         self.parse_content()
 
     def __getitem__(self, property):
@@ -155,67 +152,6 @@ class Segment(object):
         sm.extend(music)
         sm.append('}')
 
-    def read_content(self, content):
-        """
-        Extract the first music variable from the content
-        and "return" the remainder of the string list.
-        This doesn't do any interpretation of the content.
-        :param content: String list
-        :return: String lists
-        """
-
-        def find_declaration(start):
-            """
-            Return the line index of the first variable definition
-            after the given start index.
-            Returns -1 if none is found
-            :param start:
-            :return: Integer
-            """
-            i = start
-            while i < len(content):
-                if re.match(".* = {", content[i]):
-                    return i
-                i += 1
-            return -1
-
-        def find_closing(first):
-            """
-            Return the line index of the closing bracket of the
-            variable definition, after the starting index.
-            Returns -1 if the variable is not finished.
-            Add lines to content
-            :param first:
-            :return: Integer
-            """
-            result = []
-            i = first
-            while i < len(content):
-                if content[i].strip() == "}":
-                    return i
-                i += 1
-            return -1
-
-        # Determine the line indices of the
-        # opening and closing of the first music variable,
-        # and the opening of the next one
-
-        first = find_declaration(0)
-        if first == -1:
-            # No opening found, return empty lists
-            return [], []
-        last = find_closing(first)
-
-        if last == -1:
-            raise Exception("Unfinished segment in line {}: \"{}\"".format(first, content[first]))
-
-        next = find_declaration(last)
-        # if there is no 'next' declaration, return an empty list for remainder
-        remainder = content[next:] if next >= 0 else []
-
-        return content[first:last+1], remainder
-
-
 class Segments(object):
     """
     Represents a string of segments
@@ -279,6 +215,68 @@ class Segments(object):
 
         # Parse the file, slicing the music expressions / variables into an object list
         while content:
-            segment = Segment(content)
-            content = segment.remaining_content
-            self.add_segment(segment)
+            segment, content = self.split_content(content)
+            seg = Segment(segment)
+            self.add_segment(seg)
+
+    def split_content(self, content):
+        """
+        Split content into two string lists,
+        one containing the first music variable, one containing the rest.
+        Whitespace in between is discarded.
+        :param content: String list
+        :return: String lists
+        """
+
+        def find_declaration(start):
+            """
+            Return the line index of the first variable definition
+            after the given start index.
+            Returns -1 if none is found
+            :param start:
+            :return: Integer
+            """
+            i = start
+            while i < len(content):
+                if re.match(".* = {", content[i]):
+                    return i
+                i += 1
+            return -1
+
+        def find_closing(first):
+            """
+            Return the line index of the closing bracket of the
+            variable definition, after the starting index.
+            Returns -1 if the variable is not finished.
+            Add lines to content
+            :param first:
+            :return: Integer
+            """
+            result = []
+            i = first
+            while i < len(content):
+                if content[i].strip() == "}":
+                    return i
+                i += 1
+            return -1
+
+        # Determine the line indices of the
+        # opening and closing of the first music variable,
+        # and the opening of the next one
+
+        first = find_declaration(0)
+        if first == -1:
+            # No opening found, return empty lists
+            return [], []
+        last = find_closing(first)
+
+        if last == -1:
+            raise Exception("Unfinished segment in line {}: \"{}\"".format(first, content[first]))
+
+        next = find_declaration(last)
+        # if there is no 'next' declaration, return an empty list for remainder
+        remainder = content[next:] if next >= 0 else []
+
+        return content[first:last+1], remainder
+
+
