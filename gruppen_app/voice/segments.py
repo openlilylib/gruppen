@@ -150,21 +150,10 @@ class Segment(object):
             music.append(line)
             i += 1
 
-
         #store the resulting music expression
         self._properties['music'] = sm = ['{']
         sm.extend(music)
         sm.append('}')
-
-        print
-        print self['name']
-        print "barnumber start:", self._properties.get('barnumber_start', 'not defined')
-        print "time start:", self._properties.get('time_signature_start', 'not defined')
-        print "time end:", self._properties.get('time_signature_end', 'not defined')
-        print "key start:", self._properties.get('key_signature_start', 'not defined')
-        print "key end:", self._properties.get('key_signature_end', 'not defined')
-        #print ''.join(self['music'])
-
 
     def read_content(self, content):
         """
