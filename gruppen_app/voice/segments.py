@@ -49,7 +49,7 @@ class Segment(object):
         """
         Return the requested property as if Segment were a dict
         """
-        return self._properties[property]
+        return self._properties.get(property, None)
 
     def roman_index(self):
         """
@@ -250,7 +250,7 @@ class Segments(object):
 
     def __getitem__(self, segment_name):
         """Return Segment object by its name - as if Segments were a dict object"""
-        return self._segments[segment_name]
+        return self._segments.get(segment_name, None)
 
     def __iter__(self):
         """Iterator to yield Segment objects in their real order"""
