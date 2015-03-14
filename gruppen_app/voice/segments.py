@@ -88,12 +88,12 @@ class Segment(object):
             match = re.search("(\\\\time *)([0-9]+/[0-9]+)", line)
             return match.group(2) if match else ''
 
-
         # read segment name from first content line
         line = self.content[0].strip()
         self._properties['name'] = line[:line.find(' =')]
 
         # read the body of the content, extracting and/or removing lines to properties
+        first_content = False
         i = 1
         music = []
         while not i >= len(self.content) - 1:
@@ -101,17 +101,21 @@ class Segment(object):
             lstr = line.strip()
 
             # TODO: This is not really robust yet.
-            # We're only checking for the first occurrences without really testing
-            # whether there is any music *before* that.
+            # We're not handling multiline comments (or even Scheme) yet.
+
+            # Check for line with "content"
+            content = len(lstr) > 0 and not lstr.startswith('%')
 
             # Check for time signatures
             time_sig = is_time_signature(lstr)
             if time_sig:
                 # set start/end time signatures.
                 # remove content line for first
-                if not 'time_signature_start' in self._properties:
+                if not first_content and not 'time_signature_start' in self._properties:
                     self._properties['time_signature_start'] = time_sig
                     self._properties['time_signature_end'] = time_sig
+                    # flag to not set first_content to True
+                    content = False
                     i += 1
                     continue
                 else:
@@ -120,9 +124,11 @@ class Segment(object):
             # Check for key signatures
             key_sig = is_key_signature(line)
             if key_sig:
-                if not 'key_signature_start' in self._properties:
+                if not first_content and not 'key_signature_start' in self._properties:
                     self._properties['key_signature_start'] = key_sig
                     self._properties['key_signature_end'] = key_sig
+                    # flag to not set first_content to True
+                    content = False
                     i += 1
                     continue
                 else:
@@ -131,11 +137,15 @@ class Segment(object):
             # Check for barnumber checks
             barnumber_check = is_barnumber_check(line)
             if barnumber_check:
-                if not 'barnumber_start' in self._properties:
+                if not first_content and not 'barnumber_start' in self._properties:
                     self._properties['barnumber_start'] = barnumber_check
+                    # flag to not set first_content to True
+                    content = False
                     i += 1
                     continue
 
+            if not first_content and content:
+                first_content = True
 
             music.append(line)
             i += 1
