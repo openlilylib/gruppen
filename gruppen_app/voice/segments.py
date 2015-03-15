@@ -29,7 +29,7 @@ Handle the content part of the empty segments.
 
 import os, sys
 import re
-from romannumerals import *
+import romannumerals
 from report import *
 
 
@@ -66,14 +66,6 @@ class Segment(object):
         Return the requested property as if Segment were a dict
         """
         return self._properties.get(property, None)
-
-    def roman_index(self):
-        """
-        Return the integer representation of the roman numeral name
-        or -1 if name is no roman numeral
-        :return: Integer
-        """
-        return -1
 
     def parse_content(self):
         """
@@ -167,9 +159,7 @@ class Segment(object):
             i += 1
 
         #store the resulting music expression
-        self._properties['music'] = sm = ['{']
-        sm.extend(music)
-        sm.append('}')
+        self._properties['music'] = music
 
 
 class Segments(object):
@@ -187,10 +177,18 @@ class Segments(object):
         self._segments_list = []
         self._segments = {}
 
+        self._current_time_sig = ''
+        self._current_key_sig = ''
+
         # Read contents of empty segments from template file
         self.read_empty_segments(
             os.path.join(voice._root_dir, voice['project']['paths']['segment_templates'])
         )
+
+        print self.apply_template(self['XXI'])
+        print self.apply_template(self['XXII'])
+        print self.apply_template(self['XXIII'])
+        print self.apply_template(self['XXIV'])
 
     def __getitem__(self, segment_name):
         """Return Segment object by its name - as if Segments were a dict object"""
@@ -213,8 +211,94 @@ class Segments(object):
         self._segments_list.append(segment['name'])
         self._segments[segment['name']] = segment
 
-    def parse_segments(self):
-        result = {}
+    def apply_template(self, segment):
+
+        def segment_introduction():
+            """
+            Return the introduction of the segment content, with
+            - barnumber check
+            - time signature
+            - key signature
+            as appropriate.
+            """
+            result = []
+            if segment['barnumber_start']:
+                result.append('  \\barNumberCheck {}'.format(str(segment['barnumber_start'])))
+
+            if segment['time_signature_start']:
+                self._current_time_sig = segment['time_signature_start']
+                result.append('  \\time {}'.format(self._current_time_sig))
+
+            if segment['key_signature_start']:
+                self._current_key_sig = segment['key_signature_start']
+                result.append('  \\key {}'.format(self._current_key_sig))
+
+            return '\n'.join(result)
+
+        def segment_opening():
+            result = ['{']
+            result.append('    \\time {}'.format(self._current_time_sig))
+            result.append('    \\key {}'.format(self._current_key_sig))
+            result.append('')
+            result.append('    \\mark {}'.format(self.int_string(index - 1)))
+            result.append('  }')
+            return '\n'.join(result)
+
+        def segment_closing():
+            if segment['time_signature_end'] and segment['time_signature_end'] != self._current_time_sig:
+                self._current_time_sig = segment['time_signature_end']
+
+            if segment['key_signature_end'] and segment['key_signature_end'] != self._current_key_sig:
+                self._current_key_sig = segment['key_signature_end']
+
+            result = ['{']
+            result.append('    \\mark {}'.format(self.int_string(index)))
+
+            result.append('  }')
+            return '\n'.join(result)
+
+        seg_name = segment['name']
+        index = self._segments_list.index(seg_name) + 1
+        #        previous = self._segments[self._segments_list[index - 2]] if index > 1 else None
+
+        # prepare values for string replacement
+        file_name = os.path.join(self.voice.music_dir,
+                                 self.segment_int_string(seg_name, True) + '.ily')
+        part_name = self.voice['basename']
+        part_underline = '=' * len(part_name)
+
+        # This has side-effects that the opening and closing rely on
+        # (setting sefl._current_time/key), therefore it must be called first
+        introduction = segment_introduction()
+        opening = segment_opening()
+        closing = segment_closing()
+
+        return ''.join(Segment._template).format(
+            file_name = file_name,
+            segment_number = self.segment_int_string(seg_name, False),
+            segment_number_string = self.segment_int_string(seg_name, True),
+            segment_number_roman = seg_name,
+            part_name = part_name,
+            instrument_name = self.voice['display_name'],
+            part_underline = part_underline,
+            barnumber_string = '{}'.format(segment['barnumber_start']),
+            segment_opening = opening,
+            segment_closing = closing,
+            segment_introduction = introduction,
+            segment_content = ''.join(segment['music']),
+            transposition = 'TRANSPOSITION',
+            mark_number = 'MARK_NUMBER'
+        )
+
+
+    def int_string(self, value, digits = 0):
+        """
+        Return a padded string of the given integer
+        """
+        return str(value).rjust(digits, '0')
+
+
+
 
     def read_empty_segments(self, filename):
         """
@@ -237,6 +321,28 @@ class Segments(object):
             segment, content = self.split_content(content)
             seg = Segment(segment)
             self.add_segment(seg)
+
+    def roman_index(self, segment_name):
+        """
+        Return the integer representation of the roman numeral name as a string
+        or 'not-a-roman' if name is no roman numeral
+        :return: Integer
+        """
+        return romannumerals.roman2int(segment_name)
+
+
+
+    def segment_int_string(self, segment_name, padded = False):
+        """
+        Return the string of the integer index of the given segment name.
+        The index is looked up in th name list, so it isn't related to
+        the segment name itself.
+        The index is shifted to be one-based
+        """
+        index = self._segments_list.index(segment_name) + 1
+        digits = len(str(len(self._segments_list))) if padded else 0
+        return str(index).rjust(digits, '0')
+
 
     def split_content(self, content):
         """
