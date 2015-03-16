@@ -46,6 +46,8 @@ class Voice(object):
             error(("Target directory already exists:\n  {}\n" +
                 "I'm not smart enough yet, aborting.").format(self.music_dir))
             sys.exit(1)
+        else:
+            os.makedirs(self.music_dir)
 
         self.segments = segments.Segments(self)
 
