@@ -282,12 +282,11 @@ class Segments(object):
             instrument_name = self.voice['display_name'],
             part_underline = part_underline,
             barnumber_string = '{}'.format(segment['barnumber_start']),
+            transpose_reference = self.voice['transpose'],
             segment_opening = opening,
             segment_closing = closing,
             segment_introduction = introduction,
-            segment_content = ''.join(segment['music']),
-            transposition = 'TRANSPOSITION',
-            mark_number = 'MARK_NUMBER'
+            segment_content = ''.join(segment['music'])
         )
 
 

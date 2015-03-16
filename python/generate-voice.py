@@ -100,7 +100,7 @@ def get_voice_props(args):
 
     if args['transpose']:
         result['transpose'] = "\\transpose {} c".format(args['transpose'])
-
+    result['transpose'] = args['transpose'] if args['transpose'] else 'c'
     key = args['key']
     if key:
         mode = '\\minor' if key.islower() else '\\major'
