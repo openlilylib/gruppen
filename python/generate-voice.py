@@ -125,6 +125,8 @@ def main():
     # create a new Voice object for the project
     new_voice = voice.Voice(proj, voice_props)
 
+    new_voice.segments.write_segments()
+
     print '\n'.join(new_voice.segments['LXXXIX'].content[1:-1])
     print "="
 

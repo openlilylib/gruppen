@@ -398,4 +398,25 @@ class Segments(object):
 
         return content[first:last+1], remainder
 
+    def write_segment(self, segment):
+        """
+        Apply the template to a segment and write the result to disk.
+        """
+        file_content = self.apply_template(segment)
+        file_name = os.path.join(self.voice.music_dir,
+                                 self.segment_int_string(segment['name'], True) + '.ily')
 
+        try:
+            f = open(file_name, 'w')
+            f.write(file_content)
+            f.close()
+            chat('Write file {}'.format(file_name))
+        except Exception, e:
+            error(str(e))
+
+    def write_segments(self):
+        """
+        Generate the empty segment files and write them to disk
+        """
+        for s in self._segments_list:
+            self.write_segment(self[s])
