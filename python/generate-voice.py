@@ -124,11 +124,14 @@ def main():
 
     # create a new Voice object for the project
     new_voice = voice.Voice(proj, voice_props)
+    new_voice.print_props()
 
+    info('Writing {} segments to {}'.format(
+        len(new_voice.segments._segments_list),
+        os.path.join(
+            proj['paths']['root'],
+            new_voice.music_dir)))
     new_voice.segments.write_segments()
-
-    print '\n'.join(new_voice.segments['LXXXIX'].content[1:-1])
-    print "="
 
 # ####################################
 # Finally launch the program

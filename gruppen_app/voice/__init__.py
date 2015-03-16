@@ -55,3 +55,11 @@ class Voice(object):
     def __getitem__(self, property):
         """Return project property - as if Project were a dict object"""
         return self._properties[property]
+
+    def generate_part_file(self):
+        raise NotImplementedError('generate_part_file')
+
+    def print_props(self):
+        print "Voice properties:"
+        print " - music directory: {}".format(self.music_dir)
+        print " - display name: {}".format(self['display_name'])
