@@ -234,8 +234,9 @@ class Segments(object):
             result = ['{']
             result.append('    \\time {}'.format(self._current_time_sig))
             result.append('    \\key {}'.format(self._current_key_sig))
-            result.append('')
-            result.append('    \\mark {}'.format(self.int_string(index - 1)))
+            result.append('    % add optional opening music here')
+            if index > 1:
+                result.append('    \\mark {}'.format(self.int_string(index - 1)))
             result.append('  }')
             return '\n'.join(result)
 
@@ -247,7 +248,9 @@ class Segments(object):
                 self._current_key_sig = segment['key_signature_end']
 
             result = ['{']
-            result.append('    \\mark {}'.format(self.int_string(index)))
+            if index < len(self._segments_list):
+                result.append('    \\mark {}'.format(self.int_string(index)))
+            result.append('    % add optional closing music here')
 
             result.append('  }')
             return '\n'.join(result)
