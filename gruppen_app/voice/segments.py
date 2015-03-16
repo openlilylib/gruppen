@@ -185,11 +185,6 @@ class Segments(object):
             os.path.join(voice._root_dir, voice['project']['paths']['segment_templates'])
         )
 
-        print self.apply_template(self['XXI'])
-        print self.apply_template(self['XXII'])
-        print self.apply_template(self['XXIII'])
-        print self.apply_template(self['XXIV'])
-
     def __getitem__(self, segment_name):
         """Return Segment object by its name - as if Segments were a dict object"""
         return self._segments.get(segment_name, None)
