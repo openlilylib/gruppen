@@ -262,7 +262,7 @@ class Segments(object):
         #        previous = self._segments[self._segments_list[index - 2]] if index > 1 else None
 
         # prepare values for string replacement
-        file_name = os.path.join(self.voice.music_dir,
+        file_name = os.path.join(self.voice['project']['paths']['music'],
                                  self.segment_int_string(seg_name, True) + '.ily')
         part_name = self.voice['basename']
         part_underline = '=' * len(part_name)
