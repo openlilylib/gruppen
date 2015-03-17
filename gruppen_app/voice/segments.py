@@ -381,8 +381,31 @@ class Segments(object):
 
         return content[first:last+1], remainder
 
-    def write_part_concat_file(self):
-        pass
+    def write_part_concat_file(self, file_list):
+        """
+        Generate a file concatenating the whole part and write it to disk
+        """
+        template = self.voice['project'].load_template('vocal_part_concat_file')
+        # list \include clauses for all files
+        include_list = ['\\include \"{}\"'.format(l) for l in file_list]
+        include_list.append('')
+
+        file_content = ''.join(template).format(
+            file_name = self.voice['project']['templates']['vocal_part_concat_file'],
+            part_name = self.voice['basename'],
+            instrument_name = self.voice['display_name'],
+            include_list = '\n'.join(include_list)
+        )
+
+        out_filename = os.path.join(self.voice.music_dir,
+                                    'part.ily')
+        try:
+            f = open(out_filename, 'w')
+            f.write(file_content)
+            f.close()
+        except Exception, e:
+            raise
+
 
     def write_segment(self, segment, template):
         """

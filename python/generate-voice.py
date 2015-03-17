@@ -125,12 +125,16 @@ def main():
     new_voice = voice.Voice(proj, voice_props)
     new_voice.print_props()
 
+    # process all cell teimpate files and write to disk
     info('Writing {} segments to {}'.format(
         len(new_voice.segments._segments_list),
         os.path.join(
             proj['paths']['root'],
             new_voice.music_dir)))
     file_list = new_voice.segments.write_segments()
+
+    # process part concatenation template
+    new_voice.segments.write_part_concat_file(file_list)
 
 # ####################################
 # Finally launch the program
