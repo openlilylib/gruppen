@@ -159,9 +159,7 @@ class Segments(object):
         self._current_key_sig = ''
 
         # Read contents of empty segments from template file
-        self.read_empty_segments(
-            os.path.join(voice._root_dir, voice['project']['paths']['segment_templates'])
-        )
+        self.read_empty_segments()
 
     def __getitem__(self, segment_name):
         """Return Segment object by its name - as if Segments were a dict object"""
@@ -277,7 +275,7 @@ class Segments(object):
 
 
 
-    def read_empty_segments(self, filename):
+    def read_empty_segments(self):
         """
         Read the templates from disk,
         then extract the segment contents to individual objects.
@@ -285,13 +283,7 @@ class Segments(object):
         :return:
         """
 
-        try:
-            f = open(filename)
-            content = f.readlines()
-            f.close()
-        except:
-            # for now simply re-throw the exception
-            raise
+        content = self.voice['project'].load_template('empty_segments')
 
         # Parse the file, slicing the music expressions / variables into an object list
         while content:
