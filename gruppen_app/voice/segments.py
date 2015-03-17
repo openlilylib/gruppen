@@ -403,7 +403,10 @@ class Segments(object):
 
         return content[first:last+1], remainder
 
-    def write_segment(self, segment):
+    def write_part_concat_file(self):
+        pass
+
+    def write_segment(self, segment, template):
         """
         Apply the template to a segment and write the result to disk.
         """
