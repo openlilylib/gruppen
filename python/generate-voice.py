@@ -63,7 +63,6 @@ def add_commandline_args():
     commandline.parser.add_argument(
         '-c',
         '--clef',
-        default='treble',
         help=("Default clef for voice.\nDefaults to treble clef.")
     )
 
@@ -95,7 +94,7 @@ def get_voice_props(args):
         'basename': args['basename'],
         'display_name': args['name'],
         'short_instrument_name': args['short_instrument_name'],
-        'clef': '\\' + args['clef'],
+        'clef': args['clef'],
     }
 
     if args['transpose']:
