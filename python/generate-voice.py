@@ -136,6 +136,9 @@ def main():
     # process part concatenation template
     new_voice.segments.write_part_concat_file(file_list)
 
+    # process part standalone file
+    new_voice.segments.write_part_file()
+
 # ####################################
 # Finally launch the program
 if __name__ == "__main__":

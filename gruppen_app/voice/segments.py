@@ -406,6 +406,29 @@ class Segments(object):
         except Exception, e:
             raise
 
+    def write_part_file(self):
+        """
+        Generate a file for a standalone vocal part and write to disk
+        """
+        template = self.voice['project'].load_template('vocal_part_file')
+
+        file_content = ''.join(template).format(
+            part_name = self.voice['basename'],
+            display_name = self.voice['display_name'],
+            name_underline = "=" * len(self.voice['display_name'])
+        )
+
+        out_filename = os.path.join(self.voice['project']['paths']['root'],
+                                    self.voice['project']['paths']['music'],
+                                    self.voice['basename'] + '.ly')
+
+        try:
+            f = open(out_filename, 'w')
+            f.write(file_content)
+            f.close()
+        except Exception, e:
+            raise
+
 
     def write_segment(self, segment, template):
         """
