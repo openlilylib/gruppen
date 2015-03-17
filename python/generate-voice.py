@@ -130,7 +130,7 @@ def main():
         os.path.join(
             proj['paths']['root'],
             new_voice.music_dir)))
-    new_voice.segments.write_segments()
+    file_list = new_voice.segments.write_segments()
 
 # ####################################
 # Finally launch the program

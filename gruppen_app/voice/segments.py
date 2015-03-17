@@ -38,24 +38,6 @@ class Segment(object):
     Represents one segment to be used as a grid segment template.
     """
 
-    # Empty cell template
-    _template = []
-
-    @staticmethod
-    def _load_template(filename):
-        """
-        Load the template for segments
-        from a template file and store as a static variable.
-        """
-        try:
-            f = open(filename)
-            Segment._template = f.readlines()
-            f.close()
-        except:
-            # for now simply re-throw the exception
-            raise
-
-
     def __init__(self, content):
         self.content = content
         self._properties = {}
@@ -170,10 +152,6 @@ class Segments(object):
     def __init__(self, voice):
         self.voice = voice
 
-        # Template file that will later be patched with the empty segments' contents
-        Segment._load_template(os.path.join(voice._root_dir,
-                                            voice['project']['paths']['cell_template']))
-
         self._segments_list = []
         self._segments = {}
 
@@ -206,7 +184,7 @@ class Segments(object):
         self._segments_list.append(segment['name'])
         self._segments[segment['name']] = segment
 
-    def apply_template(self, segment):
+    def apply_template(self, segment, template):
 
         def segment_introduction():
             """
@@ -273,7 +251,7 @@ class Segments(object):
         opening = segment_opening()
         closing = segment_closing()
 
-        return ''.join(Segment._template).format(
+        return ''.join(template).format(
             file_name = file_name,
             segment_number = self.segment_int_string(seg_name, False),
             segment_number_string = self.segment_int_string(seg_name, True),
@@ -409,22 +387,33 @@ class Segments(object):
     def write_segment(self, segment, template):
         """
         Apply the template to a segment and write the result to disk.
+        Return the generated file name for later use
         """
-        file_content = self.apply_template(segment)
-        file_name = os.path.join(self.voice.music_dir,
-                                 self.segment_int_string(segment['name'], True) + '.ily')
+
+        file_content = self.apply_template(segment, template)
+        file_name = self.segment_int_string(segment['name'], True) + '.ily'
+        full_name = os.path.join(self.voice.music_dir,
+                                 file_name)
 
         try:
-            f = open(file_name, 'w')
+            f = open(full_name, 'w')
             f.write(file_content)
             f.close()
             chat('Write file {}'.format(file_name))
+            return file_name
         except Exception, e:
             error(str(e))
 
     def write_segments(self):
         """
         Generate the empty segment files and write them to disk
+        Returns a list with generated file names, to be used when
+        generating the part-concatenation file.
         """
+        # load templates once
+        template = self.voice['project'].load_template('vocal_cell')
+
+        result = []
         for s in self._segments_list:
-            self.write_segment(self[s])
+            result.append(self.write_segment(self[s], template))
+        return result
