@@ -237,10 +237,8 @@ class Segments(object):
             if self.voice['clef']:
                 result.append('    \\clef {}'.format(self.voice['clef']))
             result.append('    % add optional opening music here')
-#TODO: Consider this. I think we should add the \marks here, but it seems that it gets doubled with the ones
-# in the marks part, so when compiling a segment we have a doubled mark at the beginning of the cell.
-#            if index > 1:
-#                result.append('    \\mark {}'.format(self.int_string(index - 1)))
+            if index > 1:
+                result.append('    \\mark {}'.format(self.int_string(index - 1)))
             result.append('  }')
             return '\n'.join(result)
 
