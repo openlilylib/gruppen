@@ -6,3 +6,9 @@
 # Backup files
 *.*~
 *.bak
+
+# PyCharm project
+.idea/*
+
+# Eric4 project
+.eric4project/*
