@@ -33,6 +33,7 @@ import sys
 import os
 import argparse
 import atexit
+import traceback
 
 # append the _app path to Python's search path 
 # so standalone scripts have direct access to the app's modules.
@@ -71,11 +72,9 @@ atexit.register(exit_handler)
 
 # global handler for uncaught exceptions:
 from report import *
-def global_exception_handler(exctype, value, traceback):
-    error("There has been an unhandled exception. " +
-          "Its message is:\n" + value +
-          "\nTraceback:\n" +
-          traceback)
+def global_exception_handler(exctype, value, tb):
+    error("There has been an unhandled exception.\n" +
+          ''.join(traceback.format_exception(exctype, value, tb)))
     sys.exit(1)
 
 sys.excepthook = global_exception_handler

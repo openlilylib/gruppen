@@ -114,7 +114,24 @@ class Project(object):
         
         self.properties['voice_names'] =  [v for v in voices()] if callable(voices) else voices
         debug(self.properties['voice_names'])
-    
+
+    def load_template(self, template_name):
+        """
+        Return a string list with the content of the named template.
+        The file name is retrieved from the project properties JSON file.
+        """
+        try:
+            filename = os.path.join(self['paths']['root'],
+                                    self.properties['templates'][template_name])
+            f = open(filename)
+            result = f.readlines()
+            f.close()
+            return result
+        except Exception, e:
+            error("Could not load template '{}'\n{}".format(
+                template_name,
+                str(e)))
+
     def _voice_names_by_dirlist(self):
         """Return a list of directories under ['music'] path."""
         base = self['paths']['music']
@@ -156,6 +173,9 @@ class Project(object):
         self.properties['paths']['project_info'] = 'project'
         self.properties['paths']['music'] = 'music'
         self.properties['paths']['status_output'] = 'status'
+        self.properties['paths']['segment_templates'] = ['templates', 'segment_templates.ily']
+        self.properties['paths']['cell_template'] = ['templates', 'cell_template.ily']
+
         
         # read voice_names from actual directories
         self.init_voice_names(self._voice_names_by_dirlist)
