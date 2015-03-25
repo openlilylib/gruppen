@@ -1,0 +1,170 @@
+body {
+    font-family: helvetica, verdana, sans-serif;
+    font-size: 11pt;
+}
+
+#state-date {
+    font-size: 10pt;
+}
+
+#top-info {
+    color: darkred;
+}
+
+/*
+ * Part classes
+ */
+td.part-name, td.segm-num {
+	background-color: rgb(247, 247, 209);
+}
+
+td.part-name {
+    text-align: right;
+    border-left: 15px solid white;
+}
+
+td.segm-num {
+    vertical-align:bottom;
+    border-top: 15px solid white;
+}
+
+td.completed-part {
+    text-align: right;
+    border-left: 15px solid white;
+}
+
+td.completed-segm {
+    vertical-align:bottom;
+    border-top: 15px solid white;
+}
+
+td.removed {
+    background-color: grey;
+    text-align: right;
+    border-left: 15px solid white;
+}
+
+/*
+ * Segment classes
+ */
+td.reviewed, td.completed-part, td.completed-segm {
+	background-color: #00FF00;
+}
+
+td.entered {
+	background-color: yellow;
+}
+
+td.not-done {
+	background-color: #FF0000;
+}
+
+td.deleted {
+	background-color: grey;
+}
+
+td.highlighted {
+    background-color: orange;
+}
+
+td.unassigning {
+    background-color: lightblue;
+}
+
+td.reserved {
+    background-color: #CC3300;
+}
+
+td.reserved-self {
+    background-color: rgb(101, 6, 221);
+}
+
+td.ready-for-review {
+    background-color: #808000;
+}
+
+td.reserved-review {
+    background-color: #40BF00;
+}
+
+td.reserved-review-self {
+    background-color: rgb(6, 84, 124);
+}
+
+td.rpad {
+    padding-right: 6px;
+}
+
+td a {
+	display: block;
+}
+
+div.tooltip {
+    outline:none; 
+    width: 100%;
+    height: 100%;
+}
+div.tooltip strong {line-height:30px;}
+div.tooltip span {
+    z-index:10;display:none; padding:14px 20px;
+    margin-top:-46px; margin-left:28px;
+    width:300px; line-height:16px;
+    position:absolute; color:#111;
+    border:1px solid #DCA; background:#fffAF0;
+}
+    
+.callout {z-index:20;position:absolute;top:30px;border:0;left:-12px;}
+    
+/*CSS3 extras*/
+div.tooltip span
+{
+    border-radius:4px;
+    box-shadow: 5px 5px 8px #CCC;
+}
+
+#left-above {
+    float: left;
+    width: 40%;
+    margin-left: 20px;
+}
+
+#reservediv {
+    display: none;
+    float: right;
+    width: 45%;
+    color:#111;
+    height: 100%;
+    padding: 5px 20px;
+}
+
+#reservediv p {
+    margin: 2px 0px;
+}
+
+#contributor {
+    color: darkblue;
+    font-weight: bold; 
+}
+
+#clear {
+    clear: both;
+    height: 5px;
+}
+#score-tab {
+    margin: 5px;
+}
+
+.small-text {
+    font-size: 8pt;
+}
+
+
+<a href="#" class="tooltip">
+    <img src="/tooltip/css-tooltip-image.gif" />
+    <span>
+        <img class="callout" src="cssttp/callout.gif" />
+        <img src="/tooltip/src/tooltips-cd2.jpg" style="float:right;" />
+        <strong>CSS only Tooltip</strong><br />
+        Pure CSS popup tooltips with clean semantic XHTML.
+    </span>
+</a>

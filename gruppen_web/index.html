@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Score admin</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+<meta charset="UTF-8">
+</head>
+<body>
+<h1>Oskar Fried: Das trunkne Lied op. 11</h1>
+<div><span id="top-info">&nbsp;</span></div>
+<div id="left-above">
+<h3>
+<span id="status">Current status of music entry</span>
+&nbsp;
+<span id="state-date"></span>
+</h3>
+<p>
+<select id="file-select">
+</select>
+</p>
+<table>
+  <tr><td class="not-done">&nbsp;&nbsp;&nbsp;</td><td class="rpad">Unprocessed</td>
+  <td class="deleted">&nbsp;&nbsp;&nbsp;</td><td>Deleted (pausing)</td></tr>
+  <tr><td class="reserved"></td><td class="rpad">Reserved for entry</td>
+  <td class="entered"></td><td>Only entered <span class="small-text">(this shouldn't happen!)</span></td></tr>
+  <tr><td class="ready-for-review"></td><td class="rpad">Ready for review</td>
+  <td class="highlighted"></td><td>Selected segments</td></tr>
+  <tr><td class="reserved-review"></td><td class="rpad">Reserved for review</td>
+  <td class="reserved-self"></td><td>Your entry reservations</td></tr>
+  <tr><td class="reviewed"></td><td class="rpad">Finished segments</td>
+  <td class="reserved-review-self"></td><td>Your review reservations</td></tr>
+</table>
+</div>
+<div id="reservediv">
+<h3>Reserve segments for entry:</h3>
+<p id="contributor">
+Contributor: <span id="auth-usr"></span>
+</p>
+<p>&nbsp;</p>
+<p>
+<select id="part-select">
+    <option>Select part</option>
+</select>
+</p>
+<p>
+<label>Select segments:<br> 
+<span class="small-text">(type in the segments to select, e g '53' or '53 54' or '53-55')</span></label><br>
+<input type="text" id="segm-txt-inp" size="42">
+</p>
+<p>
+<button type="button" id="reserv-button">Confirm</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<button type="button" id="reset-sel">Reset</button>
+</p>
+</div>
+<div id="clear"></div>
+<table id="score-tab"></table>
+<script src="js/ajax.js"></script>
+<script src="js/reserve-form.js"></script>
+<script src="js/interactions.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/init.js"></script>
+</body>
+</html>

@@ -17,4 +17,7 @@
 *.json
 
 # auth-usr folder
-/auth-usr
+gruppen_web/auth-usr
+
+# password file
+gruppen_web/php/.btfscsswd
