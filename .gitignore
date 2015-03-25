@@ -12,3 +12,9 @@
 
 # Eric4 project
 .eric4project/*
+
+# json files
+*.json
+
+# auth-usr folder
+/auth-usr
