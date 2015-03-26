@@ -18,25 +18,27 @@
         foreach($new_data as $part => $partdata){
             
             foreach($partdata as $cat => $catdata){
+
                 
                 if(is_array($catdata)){ 
             
                     foreach($catdata as $sub => $val){
                         
-                        //check first if it's a reservetion
-                        if(array_key_exists("isReserved", $reserv_data[$part][$cat][$sub])
-                        && array_key_exists("isReserved", $val)){
+                        //check first if it's a reservation
+                        if(array_key_exists("isReserved", $val)){
                         
                             if(!$val["isReserved"] || 
                                 !$reserv_data[$part][$cat][$sub]["isReserved"]){
                 
                                 $reserv_data[$part][$cat][$sub] = $val;
+
                             }
                         }
                     }
                 }else{
                     
                     $reserv_data[$part][$cat] = $catdata;
+
                 }
             }
         }
