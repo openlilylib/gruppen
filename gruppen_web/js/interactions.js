@@ -95,7 +95,7 @@ function showToolTipSelfReserved(elem){
             addInfo = "Change to latest status to unassign";
         }
 
-        elem.appendChild(toolTip(elem.part, elem.segm, info, addInfo));
+        elem.appendChild(toolTip(elem.name, elem.segm, info, addInfo));
                     
         elem.hasToolTip = true;
                     
